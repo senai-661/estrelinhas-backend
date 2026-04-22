@@ -1,23 +1,15 @@
-import DatabaseModel from "./model/DataBaseModel.js";
+
 import { server } from "./server.js";
-import dotenv from "dotenv";
-dotenv.config();
+import {DatabaseModel} from "./model/DataBaseModel.js";
 
-const port: number = parseInt(process.env.PORT ?? "");
+const port: number = 3333;
 
-if (isNaN(port)) {
-    console.error("Variável de ambiente PORT não definida ou inválida.");
-    process.exit(1);
-}
-const host: string = process.env.HOST ?? "";
-const ok = await new DatabaseModel().testeConexao();
-
-if (ok) {
-    server.listen(port, () => {
-        console.info(`Servidor executando no endereço ${host}:${port}`);
-    });
-} else {
-
-    console.error("Não foi possível conectar com o banco de dados.");
-    process.exit(1);
-}
+new DatabaseModel().testeConexao().then((resbd) => {
+    if(resbd) {
+        server.listen(port, () => {
+            console.log(`Servidor rodando em http://localhost:${port}`);
+        })
+    } else {
+        console.log('Não foi possível conectar ao banco de dados');
+    }
+})

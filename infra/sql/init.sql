@@ -1,9 +1,12 @@
+<<<<<<< HEAD
 
 CREATE SEQUENCE seq_cod_aluno START 1;
 CREATE SEQUENCE seq_cod_plano START 1;
 CREATE SEQUENCE seq_cod_matricula START 1;
 
 
+=======
+>>>>>>> 7b0cb8f64ba5dcedfebf610140ba162ebd593032
 CREATE TABLE Aluno (
     id_aluno INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     cod_aluno VARCHAR(7) UNIQUE NOT NULL,
@@ -14,6 +17,7 @@ CREATE TABLE Aluno (
     endereco VARCHAR(200),
     email VARCHAR(80) UNIQUE NOT NULL,
     celular VARCHAR(20) NOT NULL,
+<<<<<<< HEAD
     senha VARCHAR(100) NOT NULL,
     status_aluno VARCHAR(20) DEFAULT 'ATIVO'
 );
@@ -30,6 +34,12 @@ BEFORE INSERT ON Aluno
 FOR EACH ROW EXECUTE FUNCTION gerar_cod_aluno();
 
 
+=======
+    senha VARCHAR(255) NOT NULL,
+    status_aluno VARCHAR(20) DEFAULT 'ATIVO'
+);
+
+>>>>>>> 7b0cb8f64ba5dcedfebf610140ba162ebd593032
 CREATE TABLE Plano (
     id_plano INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     cod_plano VARCHAR(7) UNIQUE NOT NULL,
@@ -40,6 +50,7 @@ CREATE TABLE Plano (
     status_plano VARCHAR(20) DEFAULT 'ATIVO'
 );
 
+<<<<<<< HEAD
 CREATE OR REPLACE FUNCTION gerar_cod_plano() RETURNS TRIGGER AS $$
 BEGIN
     NEW.cod_plano := 'PLN' || TO_CHAR(nextval('seq_cod_plano'), 'FM0000');
@@ -51,6 +62,8 @@ CREATE TRIGGER trg_gerar_cod_plano
 BEFORE INSERT ON Plano
 FOR EACH ROW EXECUTE FUNCTION gerar_cod_plano();
 
+=======
+>>>>>>> 7b0cb8f64ba5dcedfebf610140ba162ebd593032
 CREATE TABLE Matricula (
     id_matricula INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     cod_matricula VARCHAR(7) UNIQUE NOT NULL,
@@ -63,6 +76,7 @@ CREATE TABLE Matricula (
     valor_final DECIMAL(10,2)
 );
 
+<<<<<<< HEAD
 CREATE OR REPLACE FUNCTION gerar_cod_matricula() RETURNS TRIGGER AS $$
 BEGIN
     NEW.cod_matricula := 'MAT' || TO_CHAR(nextval('seq_cod_matricula'), 'FM0000');
@@ -99,6 +113,8 @@ FOR EACH ROW EXECUTE FUNCTION bloquear_mais_de_uma_matricula_ativa();
 
 
 
+=======
+>>>>>>> 7b0cb8f64ba5dcedfebf610140ba162ebd593032
 INSERT INTO Aluno
 (nome, sobrenome, cpf, data_nascimento, endereco, email, celular, senha, status_aluno)
 VALUES

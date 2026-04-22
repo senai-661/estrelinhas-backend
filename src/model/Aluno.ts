@@ -1,4 +1,4 @@
-import DatabaseModel from "./DataBaseModel.js";
+import { DatabaseModel } from "./DataBaseModel.js";
 import bcrypt from "bcrypt";
 
 const database = new DatabaseModel().pool;
