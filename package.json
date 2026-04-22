@@ -1,7 +1,7 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "Link para sprints\r - https://senai-661.notion.site/Sprint-s-Projeto-em-grupo-2f55d25a87a18004b223ffe0bf47330a?source=copy_link",
   "main": "index.js",
   "directories": {
     "doc": "docs"
@@ -10,7 +10,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "Laís Zanqueta",
+  "author": "Tauane Vitória Silva Souza",
   "license": "ISC",
   "type": "module",
   "dependencies": {
@@ -32,7 +32,6 @@
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.9.3"
   },
-  
   "repository": {
     "type": "git",
     "url": "git+https://github.com/laaiszn/sprint04.git"
