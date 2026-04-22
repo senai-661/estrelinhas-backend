@@ -184,10 +184,10 @@ class Aluno {
           alunoBD.cpf,
           alunoBD.data_nascimento,
           alunoBD.celular,
-          alunoBD.senha,        // Ordem corrigida
-          alunoBD.status_aluno, // Ordem corrigida
-          alunoBD.endereco,     // Ordem corrigida
-          alunoBD.email         // Ordem corrigida
+          alunoBD.senha,        
+          alunoBD.status_aluno, 
+          alunoBD.endereco,     
+          alunoBD.email         
         );
 
         aluno.setIdAluno(alunoBD.id_aluno);
