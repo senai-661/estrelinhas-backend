@@ -2,7 +2,7 @@
 import { server } from "./server.js";
 import {DatabaseModel} from "./model/DataBaseModel.js";
 
-const port: number = 3000;
+const port: number = 3333;
 
 new DatabaseModel().testeConexao().then((resbd) => {
     if(resbd) {
