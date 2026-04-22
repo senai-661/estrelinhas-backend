@@ -23,4 +23,4 @@ router.post("/api/matriculas", MatriculaController.novo);
 router.get("/api/matriculas/:idMatricula", MatriculaController.matricula);
 
 
-export {router};
+export {router}
