@@ -18,7 +18,7 @@ export class Auth {
     static async validacaoUsuario(req: Request, res: Response): Promise<any> {
         const { email, senha } = req.body;
 
-        const querySelectUser = `SELECT id, nome, email, senha, role FROM usuarios WHERE email=$1 AND senha=$2;`;
+        const querySelectUser = `SELECT id, nome, email, senha, role FROM Usuario WHERE email=$1 AND senha=$2;`;
         try {
             const queryResult = await database.query(querySelectUser, [email, senha]);
 
