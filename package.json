@@ -10,7 +10,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "Laís Zanqueta",
+  "author": "Tauane Vitória Silva Souza",
   "license": "ISC",
   "type": "module",
   "dependencies": {
