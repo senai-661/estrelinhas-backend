@@ -19,9 +19,9 @@ router.get("/api/alunos", Auth.verifyToken, AlunoController.todos);
 router.post("/api/alunos", Auth.verifyToken, AlunoController.novo);
 router.get("/api/alunos/:idAluno", Auth.verifyToken, AlunoController.aluno);
 
-router.get("/api/planos",  PlanoController.todos);
-router.post("/api/planos", PlanoController.novo);
-router.get("/api/planos/:idPlano", PlanoController.plano);
+router.get("/api/planos", Auth.verifyToken, PlanoController.todos);
+router.post("/api/planos", Auth.verifyToken, PlanoController.novo);
+router.get("/api/planos/:idPlano", Auth.verifyToken, PlanoController.plano);
 
 router.get("/api/matriculas", Auth.verifyToken, MatriculaController.todos);
 router.post("/api/matriculas", Auth.verifyToken, MatriculaController.novo);
