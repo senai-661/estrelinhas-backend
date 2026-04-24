@@ -27,4 +27,4 @@ router.get("/api/matriculas", Auth.verifyToken, MatriculaController.todos);
 router.post("/api/matriculas", Auth.verifyToken, MatriculaController.novo);
 router.get("/api/matriculas/:idMatricula", Auth.verifyToken, MatriculaController.matricula);
 
-export {router};
+export { router };
