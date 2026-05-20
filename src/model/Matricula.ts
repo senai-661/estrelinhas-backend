@@ -12,6 +12,8 @@ class Matricula {
     private valorPago: number;
     private formaPagamento: string;
     private statusMatricula: string;
+    private nome: string | undefined;
+    private sobrenome: string | undefined;
 
     constructor(
         _codAluno: number,
@@ -20,7 +22,9 @@ class Matricula {
         _dataVencimento: Date,
         _valorPago: number,
         _formaPagamento: string,
-        _statusMatricula: string
+        _statusMatricula: string,
+        _nome?: string,
+        _sobrenome?: string
     ) {
         this.codAluno = _codAluno;
         this.codPlano = _codPlano;
@@ -29,6 +33,8 @@ class Matricula {
         this.valorPago = _valorPago;
         this.formaPagamento = _formaPagamento;
         this.statusMatricula = _statusMatricula;
+        this.nome = _nome;
+        this.sobrenome = _sobrenome;
     }
     public getIdMatricula(): number {
         return this.idMatricula;
@@ -93,6 +99,22 @@ class Matricula {
         this.statusMatricula = statusMatricula;
     }
 
+    public getNome(): string | undefined {
+        return this.nome;
+    }
+
+    public setNome(nome: string): void {
+        this.nome = nome;
+    }
+
+    public getSobrenome(): string | undefined {
+        return this.sobrenome;
+    }
+
+    public setSobrenome(sobrenome: string): void {
+        this.sobrenome = sobrenome;
+    }
+
     static async cadastrarMatricula(matricula: MatriculaDTO): Promise<boolean> {
         try {
             const query = `
@@ -123,11 +145,14 @@ class Matricula {
     }
     static async listarMatricula(idMatricula: number): Promise<Matricula | null> {
         try {
-            const query = `SELECT * FROM Matricula WHERE id_matricula=$1;`;
+            const query = `
+                SELECT m.*, a.nome AS nome, a.sobrenome AS sobrenome
+                FROM Matricula m
+                JOIN Aluno a ON m.id_aluno = a.id_aluno
+                WHERE m.id_matricula = $1;
+            `;
             const respostaBD = await database.query(query, [idMatricula]);
             if (respostaBD.rows.length > 0) {
-
-
                 const matriculaBD = respostaBD.rows[0];
 
                 const matricula = new Matricula(
@@ -137,7 +162,9 @@ class Matricula {
                     matriculaBD.data_fim,
                     matriculaBD.valor_final,
                     matriculaBD.forma_pagamento,
-                    matriculaBD.status_matricula
+                    matriculaBD.status_matricula,
+                    matriculaBD.nome,
+                    matriculaBD.sobrenome
                 );
                 matricula.setIdMatricula(matriculaBD.id_matricula);
                 return matricula;
@@ -151,7 +178,11 @@ class Matricula {
     }
     static async listarMatriculas(): Promise<Array<Matricula> | null> {
         try {
-            const query = `SELECT * FROM Matricula;`;
+            const query = `
+                SELECT m.*, a.nome AS nome, a.sobrenome AS sobrenome
+                FROM Matricula m
+                JOIN Aluno a ON m.id_aluno = a.id_aluno;
+            `;
             const respostaBD = await database.query(query);
             const matriculas: Array<Matricula> = [];
             respostaBD.rows.forEach((matriculaBD: any) => {
@@ -162,7 +193,9 @@ class Matricula {
                     matriculaBD.data_fim,
                     matriculaBD.valor_final,
                     matriculaBD.forma_pagamento,
-                    matriculaBD.status_matricula
+                    matriculaBD.status_matricula,
+                    matriculaBD.nome,
+                    matriculaBD.sobrenome
                 );
                 matricula.setIdMatricula(matriculaBD.id_matricula);
                 matriculas.push(matricula);
