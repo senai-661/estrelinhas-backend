@@ -5,6 +5,7 @@ const database = new DatabaseModel().pool;
 
 class Aluno {
   private idAluno: number = 0;
+  private codAluno: string | undefined;
   private nome: string;
   private sobrenome: string;
   private cpf: string;
@@ -24,7 +25,8 @@ class Aluno {
     _senha: string,
     _statusAluno: string,
     _endereco?: string,
-    _email?: string
+    _email?: string,
+    _codAluno?: string
   ) {
     this.nome = _nome;
     this.sobrenome = _sobrenome;
@@ -35,6 +37,7 @@ class Aluno {
     this.statusAluno = _statusAluno;
     this.endereco = _endereco || '';
     this.email = _email || '';
+    this.codAluno = _codAluno;
   }
 
   public getIdAluno(): number {
@@ -42,6 +45,14 @@ class Aluno {
   }
   public setIdAluno(idAluno: number): void {
     this.idAluno = idAluno;
+  }
+
+  public getCodAluno(): string | undefined {
+    return this.codAluno;
+  }
+
+  public setCodAluno(codAluno: string): void {
+    this.codAluno = codAluno;
   }
 
   public getNome(): string {
@@ -56,6 +67,25 @@ class Aluno {
   }
   public setSobrenome(sobrenome: string): void {
     this.sobrenome = sobrenome;
+  }
+
+  public toJSON() {
+    return {
+      id_aluno: this.idAluno,
+      cod_aluno: this.codAluno,
+      idAluno: this.idAluno,
+      codAluno: this.codAluno,
+      ra: this.codAluno,
+      RA: this.codAluno,
+      nome: this.nome,
+      sobrenome: this.sobrenome,
+      cpf: this.cpf,
+      data_nascimento: this.dataNascimento,
+      endereco: this.endereco,
+      email: this.email,
+      celular: this.celular,
+      status_aluno: this.statusAluno
+    };
   }
 
   public getCpf(): string {
@@ -111,7 +141,7 @@ class Aluno {
     try {
       const lista: Array<Aluno> = [];
 
-      const query = `SELECT id_aluno, nome, sobrenome, cpf, data_nascimento, endereco, email, celular, status_aluno FROM Aluno;`;
+      const query = `SELECT id_aluno, cod_aluno, nome, sobrenome, cpf, data_nascimento, endereco, email, celular, status_aluno FROM Aluno;`;
       const respostaBD = await database.query(query);
 
       respostaBD.rows.forEach((alunoBD: any) => {
@@ -124,7 +154,8 @@ class Aluno {
           alunoBD.senha,       
           alunoBD.status_aluno, 
           alunoBD.endereco,    
-          alunoBD.email        
+          alunoBD.email,
+          alunoBD.cod_aluno
         );
 
         novoAluno.setIdAluno(alunoBD.id_aluno);
@@ -187,7 +218,8 @@ class Aluno {
           alunoBD.senha,        
           alunoBD.status_aluno, 
           alunoBD.endereco,    
-          alunoBD.email        
+          alunoBD.email,
+          alunoBD.cod_aluno
         );
 
         aluno.setIdAluno(alunoBD.id_aluno);
