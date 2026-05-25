@@ -1,3 +1,9 @@
+
+CREATE SEQUENCE seq_cod_aluno START 1;
+CREATE SEQUENCE seq_cod_plano START 1;
+CREATE SEQUENCE seq_cod_matricula START 1;
+
+
 CREATE TABLE Aluno (
     id_aluno INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     cod_aluno VARCHAR(7) UNIQUE NOT NULL,
@@ -8,9 +14,21 @@ CREATE TABLE Aluno (
     endereco VARCHAR(200),
     email VARCHAR(80) UNIQUE NOT NULL,
     celular VARCHAR(20) NOT NULL,
-    senha VARCHAR(255) NOT NULL,
+    senha VARCHAR(100) NOT NULL,
     status_aluno VARCHAR(20) DEFAULT 'ATIVO'
 );
+
+CREATE OR REPLACE FUNCTION gerar_cod_aluno() RETURNS TRIGGER AS $$
+BEGIN
+    NEW.cod_aluno := 'ALU' || TO_CHAR(nextval('seq_cod_aluno'), 'FM0000');
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_gerar_cod_aluno
+BEFORE INSERT ON Aluno
+FOR EACH ROW EXECUTE FUNCTION gerar_cod_aluno();
+
 
 CREATE TABLE Plano (
     id_plano INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -20,7 +38,19 @@ CREATE TABLE Plano (
     valor DECIMAL(10,2) NOT NULL,
     descricao VARCHAR(255),
     status_plano VARCHAR(20) DEFAULT 'ATIVO'
+      
 );
+
+CREATE OR REPLACE FUNCTION gerar_cod_plano() RETURNS TRIGGER AS $$
+BEGIN
+    NEW.cod_plano := 'PLN' || TO_CHAR(nextval('seq_cod_plano'), 'FM0000');
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_gerar_cod_plano
+BEFORE INSERT ON Plano
+FOR EACH ROW EXECUTE FUNCTION gerar_cod_plano();
 
 CREATE TABLE Matricula (
     id_matricula INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -33,6 +63,42 @@ CREATE TABLE Matricula (
     forma_pagamento VARCHAR(30),
     valor_final DECIMAL(10,2)
 );
+
+CREATE OR REPLACE FUNCTION gerar_cod_matricula() RETURNS TRIGGER AS $$
+BEGIN
+    NEW.cod_matricula := 'MAT' || TO_CHAR(nextval('seq_cod_matricula'), 'FM0000');
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_gerar_cod_matricula
+BEFORE INSERT ON Matricula
+FOR EACH ROW EXECUTE FUNCTION gerar_cod_matricula();
+
+
+CREATE OR REPLACE FUNCTION bloquear_mais_de_uma_matricula_ativa()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.status_matricula = 'ATIVA' THEN
+        IF EXISTS (
+            SELECT 1
+            FROM Matricula
+            WHERE id_aluno = NEW.id_aluno
+              AND status_matricula = 'ATIVA'
+        ) THEN
+            RAISE EXCEPTION 'Aluno já possui matrícula ATIVA.';
+        END IF;
+    END IF;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_validar_matricula_ativa
+BEFORE INSERT ON Matricula
+FOR EACH ROW EXECUTE FUNCTION bloquear_mais_de_uma_matricula_ativa();
+
+
 
 INSERT INTO Aluno
 (nome, sobrenome, cpf, data_nascimento, endereco, email, celular, senha, status_aluno)

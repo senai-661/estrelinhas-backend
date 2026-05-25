@@ -1,9 +1,11 @@
-import express from "express"; 
+import express from "express";
 import cors from "cors";
 import { router } from "./routes.js";
-import 'dotenv/config'; // Garante que as variáveis do .env sejam lidas
 
 const server = express();
+server.use(express.json());
+server.use(cors());
+server.use(router);
 
 server.use(cors()); 
 server.use(express.json()); 
