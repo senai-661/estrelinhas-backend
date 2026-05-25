@@ -3,12 +3,15 @@ import type {Request, Response} from "express";
 import AlunoController from "./controller/AlunoController.js";
 import PlanoController from "./controller/PlanoController.js";
 import MatriculaController from "./controller/MatriculaController.js";
+import { Auth } from "./middleware/Auth.js";
 
 const router: Router = Router();
 
 router.get("/api", (req: Request, res: Response) => {
     res.status(200).json({ mensagem: "Olá, seja bem-vindo ao GymPro!" });
 });
+router.post("/api/login", Auth.validacaoUsuario);
+
 
 router.get("/api/alunos", AlunoController.todos);
 router.post("/api/alunos", AlunoController.novo);
