@@ -1,6 +1,5 @@
 import Aluno from "../model/aluno.js";
-import type { Request, Response } from "express"; 
-//xxxxxxxxx
+import type { Request, Response } from "express";
 
 class AlunoController extends Aluno {
   /**
