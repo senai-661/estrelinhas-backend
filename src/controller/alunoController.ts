@@ -63,4 +63,3 @@ class AlunoController extends Aluno {
 }
 
 export default AlunoController;
-//ooo
