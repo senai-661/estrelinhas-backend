@@ -169,6 +169,7 @@ class Aluno {
       return false;
     }
   }
+  ////-------
 
   static async listarAluno(idAluno: number): Promise<Aluno | null> {
     try {
