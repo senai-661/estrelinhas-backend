@@ -1,4 +1,4 @@
-import DatabaseModel from "./DataBaseModel.js";
+import { DatabaseModel } from "./DataBaseModel.js";
 import bcrypt from "bcrypt";
 
 const database = new DatabaseModel().pool;
@@ -184,10 +184,10 @@ class Aluno {
           alunoBD.cpf,
           alunoBD.data_nascimento,
           alunoBD.celular,
-          alunoBD.senha,        
-          alunoBD.status_aluno, 
-          alunoBD.endereco,    
-          alunoBD.email        
+          alunoBD.senha,        // Ordem corrigida
+          alunoBD.status_aluno, // Ordem corrigida
+          alunoBD.endereco,     // Ordem corrigida
+          alunoBD.email         // Ordem corrigida
         );
 
         aluno.setIdAluno(alunoBD.id_aluno);
@@ -203,4 +203,3 @@ class Aluno {
 }
 
 export default Aluno;
-//---
