@@ -12,6 +12,13 @@ class Matricula {
     private valorPago: number;
     private formaPagamento: string;
     private statusMatricula: string;
+    private codMatricula: string | undefined;
+    private nome: string | undefined;
+    private sobrenome: string | undefined;
+    private tipoPlano: string | undefined;
+    private duracaoDias: number | undefined;
+    private valorPlano: number | undefined;
+    private statusPlano: string | undefined;
 
     constructor(
         _codAluno: number,
@@ -20,7 +27,14 @@ class Matricula {
         _dataVencimento: Date,
         _valorPago: number,
         _formaPagamento: string,
-        _statusMatricula: string
+        _statusMatricula: string,
+        _codMatricula?: string,
+        _nome?: string,
+        _sobrenome?: string,
+        _tipoPlano?: string,
+        _duracaoDias?: number,
+        _valorPlano?: number,
+        _statusPlano?: string
     ) {
         this.codAluno = _codAluno;
         this.codPlano = _codPlano;
@@ -29,6 +43,13 @@ class Matricula {
         this.valorPago = _valorPago;
         this.formaPagamento = _formaPagamento;
         this.statusMatricula = _statusMatricula;
+        this.codMatricula = _codMatricula;
+        this.nome = _nome;
+        this.sobrenome = _sobrenome;
+        this.tipoPlano = _tipoPlano;
+        this.duracaoDias = _duracaoDias;
+        this.valorPlano = _valorPlano;
+        this.statusPlano = _statusPlano;
     }
     public getIdMatricula(): number {
         return this.idMatricula;
@@ -93,6 +114,56 @@ class Matricula {
         this.statusMatricula = statusMatricula;
     }
 
+    public getNome(): string | undefined {
+        return this.nome;
+    }
+
+    public setNome(nome: string): void {
+        this.nome = nome;
+    }
+
+    public getSobrenome(): string | undefined {
+        return this.sobrenome;
+    }
+
+    public setSobrenome(sobrenome: string): void {
+        this.sobrenome = sobrenome;
+    }
+
+    public toJSON() {
+        return {
+            idMatricula: this.idMatricula,
+            codMatricula: this.codMatricula,
+            cod_matricula: this.codMatricula,
+            id_aluno: this.codAluno,
+            id_plano: this.codPlano,
+            cod_plano: this.codPlano,
+            tipo_plano: this.tipoPlano,
+            duracao_dias: this.duracaoDias,
+            valor_plano: this.valorPlano,
+            status_plano: this.statusPlano,
+            data_inicio: this.dataMatricula,
+            data_fim: this.dataVencimento,
+            valor_final: this.valorPago,
+            forma_pagamento: this.formaPagamento,
+            status_matricula: this.statusMatricula,
+            plano: {
+                cod_plano: this.codPlano,
+                tipo_plano: this.tipoPlano,
+                duracao_dias: this.duracaoDias,
+                valor: this.valorPlano,
+                status_plano: this.statusPlano
+            },
+            aluno: {
+                id_aluno: this.codAluno,
+                nome: this.nome,
+                sobrenome: this.sobrenome
+            },
+            nome: this.nome,
+            sobrenome: this.sobrenome
+        };
+    }
+
     static async cadastrarMatricula(matricula: MatriculaDTO): Promise<boolean> {
         try {
             const query = `
@@ -123,11 +194,17 @@ class Matricula {
     }
     static async listarMatricula(idMatricula: number): Promise<Matricula | null> {
         try {
-            const query = `SELECT * FROM Matricula WHERE id_matricula=$1;`;
+            const query = `
+                SELECT m.*, a.nome AS nome, a.sobrenome AS sobrenome,
+                       p.cod_plano AS cod_plano_matricula, p.tipo_plano, p.duracao_dias,
+                       p.valor AS valor_plano, p.status_plano
+                FROM Matricula m
+                JOIN Aluno a ON m.id_aluno = a.id_aluno
+                JOIN Plano p ON m.id_plano = p.id_plano
+                WHERE m.id_matricula = $1;
+            `;
             const respostaBD = await database.query(query, [idMatricula]);
             if (respostaBD.rows.length > 0) {
-
-
                 const matriculaBD = respostaBD.rows[0];
 
                 const matricula = new Matricula(
@@ -137,7 +214,14 @@ class Matricula {
                     matriculaBD.data_fim,
                     matriculaBD.valor_final,
                     matriculaBD.forma_pagamento,
-                    matriculaBD.status_matricula
+                    matriculaBD.status_matricula,
+                    matriculaBD.cod_matricula,
+                    matriculaBD.nome,
+                    matriculaBD.sobrenome,
+                    matriculaBD.tipo_plano,
+                    matriculaBD.duracao_dias,
+                    matriculaBD.valor_plano,
+                    matriculaBD.status_plano
                 );
                 matricula.setIdMatricula(matriculaBD.id_matricula);
                 return matricula;
@@ -151,7 +235,14 @@ class Matricula {
     }
     static async listarMatriculas(): Promise<Array<Matricula> | null> {
         try {
-            const query = `SELECT * FROM Matricula;`;
+            const query = `
+                SELECT m.*, a.nome AS nome, a.sobrenome AS sobrenome,
+                       p.cod_plano AS cod_plano_matricula, p.tipo_plano, p.duracao_dias,
+                       p.valor AS valor_plano, p.status_plano
+                FROM Matricula m
+                JOIN Aluno a ON m.id_aluno = a.id_aluno
+                JOIN Plano p ON m.id_plano = p.id_plano;
+            `;
             const respostaBD = await database.query(query);
             const matriculas: Array<Matricula> = [];
             respostaBD.rows.forEach((matriculaBD: any) => {
@@ -162,7 +253,14 @@ class Matricula {
                     matriculaBD.data_fim,
                     matriculaBD.valor_final,
                     matriculaBD.forma_pagamento,
-                    matriculaBD.status_matricula
+                    matriculaBD.status_matricula,
+                    matriculaBD.cod_matricula,
+                    matriculaBD.nome,
+                    matriculaBD.sobrenome,
+                    matriculaBD.tipo_plano,
+                    matriculaBD.duracao_dias,
+                    matriculaBD.valor_plano,
+                    matriculaBD.status_plano
                 );
                 matricula.setIdMatricula(matriculaBD.id_matricula);
                 matriculas.push(matricula);

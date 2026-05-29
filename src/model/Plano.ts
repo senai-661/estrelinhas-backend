@@ -8,6 +8,7 @@ class Plano {
   private codPlano: number = 0;
   private tipoPlano: string;
   private valor: number;
+  private duracaoDias: number;
   private descricao?: string;
   private statusPlano: string;
 
@@ -19,6 +20,7 @@ class Plano {
     _descricao?: string
   ) {
     this.tipoPlano = _tipoPlano;
+    this.duracaoDias = _duracaoDias;
     this.valor = _valor;
     this.statusPlano = _statusPlano;
     this.descricao = _descricao || '';
@@ -42,6 +44,14 @@ class Plano {
 
   public getValor(): number {
     return this.valor;
+  }
+
+  public getDuracaoDias(): number {
+    return this.duracaoDias;
+  }
+
+  public setDuracaoDias(duracao: number): void {
+    this.duracaoDias = duracao;
   }
 
   public setValor(valor: number): void {
