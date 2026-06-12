@@ -128,6 +128,27 @@ class Aluno {
         }
     }
 
+    static async buscarPlanoAluno(idAluno: number): Promise<any | null> {
+    try {
+        const query = `
+            SELECT *
+            FROM vw_aluno_plano
+            WHERE id_aluno = $1;
+        `;
+
+        const respostaBD = await database.query(query, [idAluno]);
+
+        if (respostaBD.rowCount && respostaBD.rowCount > 0) {
+            return respostaBD.rows[0];
+        }
+
+        return null;
+    } catch (error) {
+        console.error(`Erro ao buscar plano do aluno. ${error}`);
+        return null;
+    }
+}
+
     // cadastrarAluno continua na tabela direta
     static async cadastrarAluno(aluno: any): Promise<boolean> {
         try {

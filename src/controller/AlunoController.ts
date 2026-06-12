@@ -42,24 +42,39 @@ class AlunoController extends Aluno {
         .json({ mensagem: "Não foi possivel inserir o Aluno." });
     }
   }
-  static async aluno(req: Request, res: Response): Promise<Response> {
+static async aluno(req: Request, res: Response): Promise<Response> {
     try {
-      const idAluno: number = parseInt(req.params.idAluno as string);
+        const idAluno: number = parseInt(req.params.idAluno as string);
 
-      if (isNaN(idAluno) || idAluno <= 0) {
-        return res.status(400).json({ mensagem: "ID do Aluno inválido." });
-      }
+        if (isNaN(idAluno) || idAluno <= 0) {
+            return res.status(400).json({
+                mensagem: "ID do Aluno inválido."
+            });
+        }
 
-      const aluno = await Aluno.listarAluno(idAluno);
+        const aluno = await Aluno.listarAluno(idAluno);
 
-      return res.status(200).json(aluno);
+        if (!aluno) {
+            return res.status(404).json({
+                mensagem: "Aluno não encontrado."
+            });
+        }
+
+        const plano = await Aluno.buscarPlanoAluno(idAluno);
+
+        return res.status(200).json({
+            aluno,
+            tipo_plano: plano?.tipo_plano || "Sem plano"
+        });
+
     } catch (error) {
-      console.error(`Erro ao acessar o Aluno. ${error}`);
-      return res
-        .status(500)
-        .json({ mensagem: "Não foi possível recuperar o Aluno." });
+        console.error(`Erro ao acessar o Aluno. ${error}`);
+
+        return res.status(500).json({
+            mensagem: "Não foi possível recuperar o Aluno."
+        });
     }
-  }
+} 
 }
 
 export default AlunoController;
