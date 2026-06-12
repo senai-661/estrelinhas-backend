@@ -1,5 +1,6 @@
 import { DatabaseModel } from "./DataBaseModel.js";
 import type { MatriculaDTO } from "../interface/MatriculaDTO.js";
+import Plano from "./Plano.js";
 
 const database = new DatabaseModel().pool;
 
@@ -50,29 +51,39 @@ class Matricula {
 
     // INSERT continua na tabela direta (não na view)
     static async cadastrarMatricula(matricula: MatriculaDTO): Promise<boolean> {
-        try {
-            const query = `
-                INSERT INTO Matricula 
-                (cod_matricula, id_aluno, id_plano, data_inicio, data_fim, status_matricula, forma_pagamento, valor_final)
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-                RETURNING id_matricula;
-            `;
-            const valores = [
-                matricula.cod_matricula,
-                matricula.id_aluno,
-                matricula.id_plano,
-                matricula.data_inicio,
-                matricula.data_fim,
-                matricula.status_matricula,
-                matricula.forma_pagamento,
-                matricula.valor_final
-            ];
-            const respostaBD = await database.query(query, valores);
-            return (respostaBD.rowCount ?? 0) > 0;
-        } catch (error) {
-            console.error(`Erro ao cadastrar matrícula: ${error}`);
-            return false;
-        }
+    try {
+        const plano = await Plano.listarPlano(matricula.id_plano);
+        const valorFinal = plano ? plano.getValor() : 0;
+       
+
+     
+        const query = `
+            INSERT INTO Matricula 
+            (id_aluno, id_plano, data_inicio, data_fim, status_matricula, forma_pagamento, valor_final)
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            RETURNING id_matricula;
+        `;
+
+        const valores = [
+            matricula.id_aluno,
+            matricula.id_plano,
+            matricula.data_inicio,
+            matricula.data_fim,
+            'ATIVO',
+            matricula.forma_pagamento,
+            valorFinal
+        ];
+
+        const respostaBD = await database.query(query, valores);
+        return (respostaBD.rowCount ?? 0) > 0;
+
+    } catch (error) {
+        console.error(`Erro ao cadastrar matrícula: ${error}`);
+        return false;
+    }
+
+
+
     }
 
     // listarMatriculas agora usa a VIEW
@@ -80,13 +91,27 @@ class Matricula {
         try {
             const query = `SELECT * FROM vw_matriculas_detalhadas ORDER BY id_matricula;`;
             const respostaBD = await database.query(query);
-            return respostaBD.rows;
-        } catch (error) {
-            console.error(`Erro ao listar matrículas. ${error}`);
-            return null;
-        }
+            const matriculas: Array<Matricula> = [];
+            respostaBD.rows.forEach((matriculaBD: any) => {
+                matriculas.push({
+                    idMatricula: matriculaBD.id_matricula,
+                    codAluno: matriculaBD.id_aluno,
+                    codPlano: matriculaBD.id_plano,
+                    dataMatricula: matriculaBD.data_inicio,
+                    dataVencimento: matriculaBD.data_fim,
+                    valorPago: matriculaBD.valor_final,
+                    formaPagamento: matriculaBD.forma_pagamento,
+                    statusMatricula: matriculaBD.status_matricula,
+                } as any);
+            });
+            return matriculas;
+            
+        
+    } catch(error) {
+        console.error(`Erro ao listar matrículas. ${error}`);
+        return null;
     }
-
+    }
     // listarMatricula por ID também usa a VIEW
     static async listarMatricula(idMatricula: number): Promise<any | null> {
         try {
