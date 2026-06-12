@@ -6,7 +6,7 @@ class PlanoController extends Plano {
 
     static async todos(req: Request, res: Response): Promise<Response> {
         try {
-            const listaPlanos: Array<Plano> | null = await Plano.listarPlanos();
+            const listaPlanos: Array<PlanoDTO> | null = await Plano.listarPlanos();
             return res.status(200).json(listaPlanos);
         } catch (error) {
             console.error(`Erro ao consultar modelo. ${error}`);
@@ -31,14 +31,27 @@ class PlanoController extends Plano {
 
     static async plano(req: Request, res: Response): Promise<Response> {
         try {
-           const codPlano = req.params.idPlano as string;
+            const codPlano = req.params.idPlano as string;
 
             if (!codPlano) {
                 return res.status(400).json({ mensagem: "Código do plano inválido." });
             }
 
             const plano = await Plano.listarPlano(codPlano);
-            return res.status(200).json(plano);
+
+            if (!plano) {
+                return res.status(404).json({ mensagem: "Plano não encontrado." });
+            }
+
+            // Retorna como DTO em snake_case, igual ao listarPlanos()
+            return res.status(200).json({
+                cod_plano: plano.getCodPlano(),
+                tipo_plano: plano.getTipoPlano(),
+                valor: plano.getValor(),
+                descricao: plano.getDescricao(),
+                status_plano: plano.getStatusPlano(),
+            });
+
         } catch (error) {
             console.error(`Erro ao acessar o plano. ${error}`);
             return res.status(500).json({ mensagem: "Não foi possível recuperar o plano." });
