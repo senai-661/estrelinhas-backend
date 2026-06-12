@@ -121,7 +121,7 @@ class Plano {
       return false;
     }
   }
-  static async listarPlano(codPlano: string): Promise<Plano | null> {
+  static async listarPlano(codPlano: number): Promise<Plano | null> {
     try {
 
     const query = `SELECT * FROM Plano WHERE id_plano=$1`;

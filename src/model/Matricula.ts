@@ -96,7 +96,7 @@ class Matricula {
 
     static async cadastrarMatricula(matricula: MatriculaDTO): Promise<boolean> {
     try {
-        const plano = await Plano.listarPlano(String(matricula.id_plano));
+        const plano = await Plano.listarPlano(matricula.id_plano);
         const valorFinal = plano ? plano.getValor() : 0;
        
 

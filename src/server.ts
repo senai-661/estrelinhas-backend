@@ -7,9 +7,6 @@ server.use(express.json());
 server.use(cors());
 server.use(router);
 
-<<<<<<< HEAD
-export { server }
-=======
 server.use(cors()); 
 server.use(express.json()); 
 server.use(router); 
@@ -21,4 +18,3 @@ server.listen(PORT, () => {
 });
 
 export { server };
->>>>>>> 828d46d9c9db95f36b454e0f10bacb101ddbe927
