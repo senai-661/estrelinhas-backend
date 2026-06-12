@@ -2,7 +2,7 @@ import { Router } from "express";
 import type {Request, Response} from "express";
 import AlunoController from "./controller/AlunoController.js";
 import PlanoController from "./controller/PlanoController.js";
-import MatriculaController from "./controller/matriculaController.js";
+import MatriculaController from "./controller/AlunoController.js";
 import { Auth } from "./middleware/Auth.js";
 
 const router: Router = Router();

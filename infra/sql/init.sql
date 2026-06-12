@@ -141,3 +141,59 @@ VALUES
 (8,8,'2026-02-12','2026-02-13','FINALIZADA','DINHEIRO',149.90),
 (9,6,'2026-01-20','2026-02-20','CANCELADA','PIX',249.90),
 (10,10,'2026-01-05','2026-02-05','FINALIZADA','CARTAO',89.90);
+
+CREATE OR REPLACE PROCEDURE sp_cadastrar_matricula(
+    p_id_aluno INT,
+    p_id_plano INT,
+    p_data_inicio DATE,
+    p_forma_pagamento VARCHAR(30)
+)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_duracao INTEGER;
+    v_valor DECIMAL(10,2);
+BEGIN
+
+    IF NOT EXISTS (
+        SELECT 1
+        FROM Aluno
+        WHERE id_aluno = p_id_aluno
+    ) THEN
+        RAISE EXCEPTION 'Aluno não encontrado.';
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1
+        FROM Plano
+        WHERE id_plano = p_id_plano
+    ) THEN
+        RAISE EXCEPTION 'Plano não encontrado.';
+    END IF;
+
+    SELECT duracao_dias, valor
+    INTO v_duracao, v_valor
+    FROM Plano
+    WHERE id_plano = p_id_plano;
+
+    INSERT INTO Matricula(
+        id_aluno,
+        id_plano,
+        data_inicio,
+        data_fim,
+        status_matricula,
+        forma_pagamento,
+        valor_final
+    )
+    VALUES(
+        p_id_aluno,
+        p_id_plano,
+        p_data_inicio,
+        p_data_inicio + v_duracao,
+        'ATIVA',
+        p_forma_pagamento,
+        v_valor
+    );
+
+END;
+$$;
