@@ -1,4 +1,4 @@
-import Matricula from "../model/Matricula.js";
+import Matricula from "../model/matricula.js";
 import type { Request, Response } from "express";
 
 class MatriculaController extends Matricula {
