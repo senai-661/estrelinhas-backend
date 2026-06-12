@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const port: number = parseInt(process.env.PORT as string);
+const port: number = parseInt(process.env.PORT as string) || 3333;
 const host: string = process.env.HOST ?? "";
 
 new DatabaseModel().testeConexao().then((ok) => {

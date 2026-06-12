@@ -11,6 +11,8 @@ const router: Router = Router();
 router.get("/api", (req: Request, res: Response) => {
     res.status(200).json({ mensagem: "Olá, seja bem-vindo ao GymPro!" });
 });
+router.post("/api/login", Auth.validacaoUsuario);
+
 
 // rota de login (pública)
 router.post("/api/login", Auth.validacaoUsuario);

@@ -1,6 +1,11 @@
 {
-  "watch": [ "src" ],
+  "watch": ["src"],
   "ext": "ts",
+<<<<<<< HEAD
   "ignore": [],
   "exec": "node --loader ts-node/esm ./src/app.ts"
 }
+=======
+  "exec": "node --loader ts-node/esm src/server.ts"
+}
+>>>>>>> 828d46d9c9db95f36b454e0f10bacb101ddbe927
