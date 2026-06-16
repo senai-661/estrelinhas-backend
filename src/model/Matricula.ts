@@ -1,5 +1,6 @@
 import { DatabaseModel } from "./DataBaseModel.js";
 import type { MatriculaDTO } from "../interface/MatriculaDTO.js";
+import Plano from "./Plano.js";
 
 const database = new DatabaseModel().pool;
 
@@ -94,32 +95,45 @@ class Matricula {
     }
 
     static async cadastrarMatricula(matricula: MatriculaDTO): Promise<boolean> {
-        try {
-            const query = `
+    try {
+        const plano = await Plano.listarPlano(matricula.id_plano);
+        const valorFinal = plano ? plano.getValor() : 0;
+
+        const query = `
             INSERT INTO Matricula 
-            (cod_matricula, id_aluno, id_plano, data_inicio, data_fim, status_matricula, forma_pagamento, valor_final)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+            (id_aluno, id_plano, data_inicio, data_fim, status_matricula, forma_pagamento, valor_final)
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
             RETURNING id_matricula;
         `;
 
-            const valores = [
-                matricula.cod_matricula,
-                matricula.id_aluno,
-                matricula.id_plano,
-                matricula.data_inicio,
-                matricula.data_fim,
-                matricula.status_matricula,
-                matricula.forma_pagamento,
-                matricula.valor_final
-            ];
+        const valores = [
+            matricula.id_aluno,
+            matricula.id_plano,
+            matricula.data_inicio,
+            matricula.data_fim,
+            'ATIVA',
+            matricula.forma_pagamento,
+            valorFinal
+        ];
 
-            const respostaBD = await database.query(query, valores);
+        const respostaBD = await database.query(query, valores);
 
-            return (respostaBD.rowCount ?? 0) > 0;
-        } catch (error) {
-            console.error(`Erro ao cadastrar matrícula: ${error}`);
-            return false;
+        if ((respostaBD.rowCount ?? 0) > 0) {
+            await database.query(
+                `UPDATE Aluno SET status_aluno = 'ATIVO' WHERE id_aluno = $1`,
+                [matricula.id_aluno]
+            );
+            return true;
         }
+
+        return false;
+
+    } catch (error) {
+        console.error(`Erro ao cadastrar matrícula: ${error}`);
+        return false;
+    }
+
+
     }
     static async listarMatricula(idMatricula: number): Promise<Matricula | null> {
         try {
@@ -155,23 +169,24 @@ class Matricula {
             const respostaBD = await database.query(query);
             const matriculas: Array<Matricula> = [];
             respostaBD.rows.forEach((matriculaBD: any) => {
-                const matricula = new Matricula(
-                    matriculaBD.id_aluno,
-                    matriculaBD.id_plano,
-                    matriculaBD.data_inicio,
-                    matriculaBD.data_fim,
-                    matriculaBD.valor_final,
-                    matriculaBD.forma_pagamento,
-                    matriculaBD.status_matricula
-                );
-                matricula.setIdMatricula(matriculaBD.id_matricula);
-                matriculas.push(matricula);
+                matriculas.push({
+                    idMatricula: matriculaBD.id_matricula,
+                    codAluno: matriculaBD.id_aluno,
+                    codPlano: matriculaBD.id_plano,
+                    dataMatricula: matriculaBD.data_inicio,
+                    dataVencimento: matriculaBD.data_fim,
+                    valorPago: matriculaBD.valor_final,
+                    formaPagamento: matriculaBD.forma_pagamento,
+                    statusMatricula: matriculaBD.status_matricula,
+                } as any);
             });
             return matriculas;
-        } catch (error) {
-            console.error(`Erro ao listar matrículas. ${error}`);
-            return null;
-        }
+            
+        
+    } catch(error) {
+        console.error(`Erro ao listar matrículas. ${error}`);
+        return null;
     }
+}
 }
 export default Matricula;

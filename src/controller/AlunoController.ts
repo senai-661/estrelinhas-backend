@@ -1,4 +1,4 @@
-import Aluno from "../model/aluno.js"
+import Aluno from "../model/Aluno.js";
 import type { Request, Response } from "express";
 
 class AlunoController extends Aluno {
@@ -44,20 +44,22 @@ class AlunoController extends Aluno {
   }
   static async aluno(req: Request, res: Response): Promise<Response> {
     try {
-      const idAluno: number = parseInt(req.params.idAluno as string);
+        const idAluno: number = parseInt(req.params.idAluno as string);
 
-      if (isNaN(idAluno) || idAluno <= 0) {
-        return res.status(400).json({ mensagem: "ID do Aluno inválido." });
-      }
+        if (isNaN(idAluno) || idAluno <= 0) {
+            return res.status(400).json({ mensagem: "ID do Aluno inválido." });
+        }
 
-      const aluno = await Aluno.listarAluno(idAluno);
+        const aluno = await Aluno.listarAlunoComPlano(idAluno);
 
-      return res.status(200).json(aluno);
+        if (!aluno) {
+            return res.status(404).json({ mensagem: "Aluno não encontrado." });
+        }
+
+        return res.status(200).json(aluno);
     } catch (error) {
-      console.error(`Erro ao acessar o Aluno. ${error}`);
-      return res
-        .status(500)
-        .json({ mensagem: "Não foi possível recuperar o Aluno." });
+        console.error(`Erro ao acessar o Aluno. ${error}`);
+        return res.status(500).json({ mensagem: "Não foi possível recuperar o Aluno." });
     }
   }
 }
