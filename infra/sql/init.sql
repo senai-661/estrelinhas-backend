@@ -196,7 +196,6 @@ BEGIN
 END;
 $$;
 
----
 
 CREATE OR REPLACE PROCEDURE sp_cancelar_matricula(
     p_id_matricula INTEGER
