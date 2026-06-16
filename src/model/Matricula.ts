@@ -31,6 +31,7 @@ class Matricula {
         this.formaPagamento = _formaPagamento;
         this.statusMatricula = _statusMatricula;
     }
+
     public getIdMatricula(): number {
         return this.idMatricula;
     }
@@ -63,6 +64,7 @@ class Matricula {
         this.dataMatricula = dataMatricula;
     }
 
+
     public getDataVencimento(): Date {
         return this.dataVencimento;
     }
@@ -78,6 +80,7 @@ class Matricula {
     public setValorPago(valorPago: number): void {
         this.valorPago = valorPago;
     }
+
     public getFormaPagamento(): string {
         return this.formaPagamento;
     }
@@ -94,56 +97,59 @@ class Matricula {
         this.statusMatricula = statusMatricula;
     }
 
+    /**
+     * Cadastra uma nova matrícula chamando a Stored Procedure sp_cadastrar_matricula.
+     * A SP insere a matrícula e atualiza o status do aluno para ATIVO.
+     */
     static async cadastrarMatricula(matricula: MatriculaDTO): Promise<boolean> {
-    try {
-        const plano = await Plano.listarPlano(matricula.id_plano);
-        const valorFinal = plano ? plano.getValor() : 0;
+        try {
+            const plano = await Plano.listarPlano(matricula.id_plano);
+            const valorFinal = plano ? plano.getValor() : 0;
 
-        const query = `
-            INSERT INTO Matricula 
-            (id_aluno, id_plano, data_inicio, data_fim, status_matricula, forma_pagamento, valor_final)
-            VALUES ($1, $2, $3, $4, $5, $6, $7)
-            RETURNING id_matricula;
-        `;
-
-        const valores = [
-            matricula.id_aluno,
-            matricula.id_plano,
-            matricula.data_inicio,
-            matricula.data_fim,
-            'ATIVA',
-            matricula.forma_pagamento,
-            valorFinal
-        ];
-
-        const respostaBD = await database.query(query, valores);
-
-        if ((respostaBD.rowCount ?? 0) > 0) {
             await database.query(
-                `UPDATE Aluno SET status_aluno = 'ATIVO' WHERE id_aluno = $1`,
-                [matricula.id_aluno]
+                `CALL sp_cadastrar_matricula($1, $2, $3, $4, $5, $6)`,
+                [
+                    matricula.id_aluno,
+                    matricula.id_plano,
+                    matricula.data_inicio,
+                    matricula.data_fim,
+                    matricula.forma_pagamento,
+                    valorFinal
+                ]
             );
+
             return true;
+        } catch (error) {
+            console.error(`Erro ao cadastrar matrícula: ${error}`);
+            return false;
         }
-
-        return false;
-
-    } catch (error) {
-        console.error(`Erro ao cadastrar matrícula: ${error}`);
-        return false;
     }
 
+    /**
+     * Cancela uma matrícula chamando a Stored Procedure sp_cancelar_matricula.
+     * A SP cancela a matrícula e atualiza o status do aluno para INATIVO se necessário.
+     */
+    static async cancelarMatricula(idMatricula: number): Promise<boolean> {
+        try {
+            await database.query(
+                `CALL sp_cancelar_matricula($1)`,
+                [idMatricula]
+            );
 
+            return true;
+        } catch (error) {
+            console.error(`Erro ao cancelar matrícula: ${error}`);
+            return false;
+        }
     }
+
     static async listarMatricula(idMatricula: number): Promise<Matricula | null> {
         try {
             const query = `SELECT * FROM Matricula WHERE id_matricula=$1;`;
             const respostaBD = await database.query(query, [idMatricula]);
+
             if (respostaBD.rows.length > 0) {
-
-
                 const matriculaBD = respostaBD.rows[0];
-
                 const matricula = new Matricula(
                     matriculaBD.id_aluno,
                     matriculaBD.id_plano,
@@ -161,13 +167,14 @@ class Matricula {
             console.error(`Erro ao listar matrícula. ${error}`);
             return null;
         }
-
     }
+
     static async listarMatriculas(): Promise<Array<Matricula> | null> {
         try {
             const query = `SELECT * FROM Matricula;`;
             const respostaBD = await database.query(query);
             const matriculas: Array<Matricula> = [];
+
             respostaBD.rows.forEach((matriculaBD: any) => {
                 matriculas.push({
                     idMatricula: matriculaBD.id_matricula,
@@ -180,13 +187,13 @@ class Matricula {
                     statusMatricula: matriculaBD.status_matricula,
                 } as any);
             });
+
             return matriculas;
-            
-        
-    } catch(error) {
-        console.error(`Erro ao listar matrículas. ${error}`);
-        return null;
+        } catch (error) {
+            console.error(`Erro ao listar matrículas. ${error}`);
+            return null;
+        }
     }
 }
-}
+
 export default Matricula;
