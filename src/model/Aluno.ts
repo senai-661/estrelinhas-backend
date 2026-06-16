@@ -111,7 +111,7 @@ class Aluno {
     try {
       const lista: Array<Aluno> = [];
 
-      const query = `SELECT id_aluno, nome, sobrenome, cpf, data_nascimento, endereco, email, celular, status_aluno FROM Aluno;`;
+      const query = `SELECT * FROM Aluno ORDER BY status_aluno ASC, nome ASC;`;
       const respostaBD = await database.query(query);
 
       respostaBD.rows.forEach((alunoBD: any) => {
@@ -200,6 +200,21 @@ class Aluno {
       return null;
     }
   }
+  static async listarAlunoComPlano(idAluno: number): Promise<any | null> {
+    try {
+        const query = `SELECT * FROM vw_aluno_com_plano WHERE id_aluno = $1;`;
+        const respostaBD = await database.query(query, [idAluno]);
+
+        if (respostaBD.rowCount && respostaBD.rowCount > 0) {
+            return respostaBD.rows[0];
+        }
+        return null;
+    } catch (error) {
+        console.error(`Erro ao buscar aluno com plano. ${error}`);
+        return null;
+    }
 }
+}
+
 
 export default Aluno;

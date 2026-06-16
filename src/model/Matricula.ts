@@ -96,11 +96,9 @@ class Matricula {
 
     static async cadastrarMatricula(matricula: MatriculaDTO): Promise<boolean> {
     try {
-        const plano = await Plano.listarPlano(String(matricula.id_plano));
+        const plano = await Plano.listarPlano(matricula.id_plano);
         const valorFinal = plano ? plano.getValor() : 0;
-       
 
-     
         const query = `
             INSERT INTO Matricula 
             (id_aluno, id_plano, data_inicio, data_fim, status_matricula, forma_pagamento, valor_final)
@@ -113,19 +111,27 @@ class Matricula {
             matricula.id_plano,
             matricula.data_inicio,
             matricula.data_fim,
-            'ATIVO',
+            'ATIVA',
             matricula.forma_pagamento,
             valorFinal
         ];
 
         const respostaBD = await database.query(query, valores);
-        return (respostaBD.rowCount ?? 0) > 0;
+
+        if ((respostaBD.rowCount ?? 0) > 0) {
+            await database.query(
+                `UPDATE Aluno SET status_aluno = 'ATIVO' WHERE id_aluno = $1`,
+                [matricula.id_aluno]
+            );
+            return true;
+        }
+
+        return false;
 
     } catch (error) {
         console.error(`Erro ao cadastrar matrícula: ${error}`);
         return false;
     }
-
 
 
     }
