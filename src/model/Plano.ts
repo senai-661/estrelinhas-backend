@@ -19,7 +19,7 @@ class Plano {
     _descricao?: string
   ) {
     this.tipoPlano = _tipoPlano;
-    this.valor = _valor;
+    this.valor = parseFloat(_valor as any);
     this.statusPlano = _statusPlano;
     this.descricao = _descricao || '';
   }
@@ -65,35 +65,32 @@ class Plano {
   }
 
 
-  static async listarPlanos(): Promise<Array<Plano> | null> {
+  static async listarPlanos(): Promise<Array<PlanoDTO> | null> {
     try {
-
-      const lista: Array<Plano> = [];
       const query = `SELECT * FROM Plano;`;
-
       const respostaBD = await database.query(query);
 
-      respostaBD.rows.forEach((planoBD: any) => {
 
-        const plano = new Plano(
-          planoBD.tipo_plano,
-          planoBD.duracao_dias,
-          planoBD.valor,
-          planoBD.status_plano,
-          planoBD.descricao
-        );
+      if (respostaBD.rows.length > 0) {
 
-        plano.setCodPlano(planoBD.cod_plano);
+        
+      }
 
-        lista.push(plano);
-      });
-
-      return lista;
+      return respostaBD.rows.map((planoBD: any) => ({
+        cod_plano: planoBD.id_plano,  
+        tipo_plano: planoBD.tipo_plano,
+        duracao_dias: planoBD.duracao_dias,
+        valor: planoBD.valor,
+        descricao: planoBD.descricao,
+        status_plano: planoBD.status_plano,
+      }));
 
     } catch (error) {
       console.error("Erro ao listar planos", error);
       return null;
     }
+
+
   }
   static async cadastrarPlano(plano: PlanoDTO): Promise<boolean> {
     try {
@@ -104,21 +101,21 @@ class Plano {
             RETURNING cod_plano;
         `;
 
-      // O array de valores DEVE ter 6 itens na ordem exata da query acima
       const respostaBD = await database.query(query, [
-        plano.tipo_plano,   // $2 -> tipo_plano
-        plano.duracao_dias, // $3 -> duracao_dias
-        plano.valor,        // $4 -> valor
-        plano.descricao,    // $5 -> descricao
-        plano.status_plano  // $6 -> status_plano
+        plano.tipo_plano,  
+        plano.duracao_dias, 
+        plano.valor,        
+        plano.descricao,   
+        plano.status_plano  
       ]);
 
       if (respostaBD.rows.length > 0) {
-        console.info(`Plano cadastrado com sucesso. ID: ${respostaBD.rows[0].cod_plano}`);
+       console.info(`Plano cadastrado com sucesso. ID: ${respostaBD.rows[0].id_plano}`); 
         return true;
       }
 
       return false;
+      
     } catch (error) {
       console.error(`Erro ao cadastrar plano. ${error}`);
       return false;
@@ -127,7 +124,7 @@ class Plano {
   static async listarPlano(codPlano: string): Promise<Plano | null> {
     try {
 
-      const query = `SELECT * FROM Plano WHERE cod_plano=$1`;
+    const query = `SELECT * FROM Plano WHERE id_plano=$1`;
 
       const respostaBD = await database.query(query, [codPlano]);
 
