@@ -32,36 +32,100 @@ class Aluno {
         this.celular = _celular;
         this.senha = _senha;
         this.statusAluno = _statusAluno;
-        this.endereco = _endereco || '';
-        this.email = _email || '';
+        this.endereco = _endereco || "";
+        this.email = _email || "";
     }
 
-    public getIdAluno(): number { return this.idAluno; }
-    public setIdAluno(idAluno: number): void { this.idAluno = idAluno; }
-    public getNome(): string { return this.nome; }
-    public setNome(nome: string): void { this.nome = nome; }
-    public getSobrenome(): string { return this.sobrenome; }
-    public setSobrenome(sobrenome: string): void { this.sobrenome = sobrenome; }
-    public getCpf(): string { return this.cpf; }
-    public setCpf(cpf: string): void { this.cpf = cpf; }
-    public getDataNascimento(): Date { return this.dataNascimento!; }
-    public setDataNascimento(dataNascimento: Date): void { this.dataNascimento = dataNascimento; }
-    public getCelular(): string { return this.celular; }
-    public setCelular(celular: string): void { this.celular = celular; }
-    public getEmail(): string { return this.email; }
-    public setEmail(email: string): void { this.email = email; }
-    public getEndereco(): string { return this.endereco!; }
-    public setEndereco(endereco: string): void { this.endereco = endereco; }
-    public getSenha(): string { return this.senha; }
-    public setSenha(senha: string): void { this.senha = senha; }
-    public getStatusAluno(): string { return this.statusAluno; }
-    public setStatusAluno(statusAluno: string): void { this.statusAluno = statusAluno; }
+    public getIdAluno(): number {
+        return this.idAluno;
+    }
 
-    // listarAlunos continua na tabela direta (sem JOIN, nÃ£o precisa de view)
+    public setIdAluno(idAluno: number): void {
+        this.idAluno = idAluno;
+    }
+
+    public getNome(): string {
+        return this.nome;
+    }
+
+    public setNome(nome: string): void {
+        this.nome = nome;
+    }
+
+    public getSobrenome(): string {
+        return this.sobrenome;
+    }
+
+    public setSobrenome(sobrenome: string): void {
+        this.sobrenome = sobrenome;
+    }
+
+    public getCpf(): string {
+        return this.cpf;
+    }
+
+    public setCpf(cpf: string): void {
+        this.cpf = cpf;
+    }
+
+    public getDataNascimento(): Date {
+        return this.dataNascimento!;
+    }
+
+    public setDataNascimento(dataNascimento: Date): void {
+        this.dataNascimento = dataNascimento;
+    }
+
+    public getCelular(): string {
+        return this.celular;
+    }
+
+    public setCelular(celular: string): void {
+        this.celular = celular;
+    }
+
+    public getEmail(): string {
+        return this.email;
+    }
+
+    public setEmail(email: string): void {
+        this.email = email;
+    }
+
+    public getEndereco(): string {
+        return this.endereco!;
+    }
+
+    public setEndereco(endereco: string): void {
+        this.endereco = endereco;
+    }
+
+    public getSenha(): string {
+        return this.senha;
+    }
+
+    public setSenha(senha: string): void {
+        this.senha = senha;
+    }
+
+    public getStatusAluno(): string {
+        return this.statusAluno;
+    }
+
+    public setStatusAluno(statusAluno: string): void {
+        this.statusAluno = statusAluno;
+    }
+
     static async listarAlunos(): Promise<Array<Aluno> | null> {
         try {
             const lista: Array<Aluno> = [];
-            const query = `SELECT * FROM Aluno ORDER BY nome;`;
+
+            const query = `
+                SELECT *
+                FROM Aluno
+                ORDER BY status_aluno ASC, nome ASC;
+            `;
+
             const respostaBD = await database.query(query);
 
             respostaBD.rows.forEach((alunoBD: any) => {
@@ -76,7 +140,9 @@ class Aluno {
                     alunoBD.endereco,
                     alunoBD.email
                 );
+
                 novoAluno.setIdAluno(alunoBD.id_aluno);
+
                 lista.push(novoAluno);
             });
 
@@ -87,14 +153,19 @@ class Aluno {
         }
     }
 
-    // listarAluno por ID continua na tabela direta
     static async listarAluno(idAluno: number): Promise<Aluno | null> {
         try {
-            const query = `SELECT * FROM Aluno WHERE id_aluno = $1;`;
+            const query = `
+                SELECT *
+                FROM Aluno
+                WHERE id_aluno = $1;
+            `;
+
             const respostaBD = await database.query(query, [idAluno]);
 
             if (respostaBD.rowCount && respostaBD.rowCount > 0) {
                 const alunoBD = respostaBD.rows[0];
+
                 const aluno = new Aluno(
                     alunoBD.nome,
                     alunoBD.sobrenome,
@@ -106,9 +177,12 @@ class Aluno {
                     alunoBD.endereco,
                     alunoBD.email
                 );
+
                 aluno.setIdAluno(alunoBD.id_aluno);
+
                 return aluno;
             }
+
             return null;
         } catch (error) {
             console.error(`Erro ao buscar aluno. ${error}`);
@@ -116,11 +190,16 @@ class Aluno {
         }
     }
 
-    // listarAlunosAtivos usa a VIEW (envolve 2 tabelas)
     static async listarAlunosAtivos(): Promise<any[] | null> {
         try {
-            const query = `SELECT * FROM vw_alunos_ativos ORDER BY nome;`;
+            const query = `
+                SELECT *
+                FROM vw_alunos_ativos
+                ORDER BY nome;
+            `;
+
             const respostaBD = await database.query(query);
+
             return respostaBD.rows;
         } catch (error) {
             console.error(`Erro ao listar alunos ativos. ${error}`);
@@ -129,34 +208,36 @@ class Aluno {
     }
 
     static async buscarPlanoAluno(idAluno: number): Promise<any | null> {
-    try {
-        const query = `
-            SELECT *
-            FROM vw_aluno_plano
-            WHERE id_aluno = $1;
-        `;
+        try {
+            const query = `
+                SELECT *
+                FROM vw_aluno_plano
+                WHERE id_aluno = $1;
+            `;
 
-        const respostaBD = await database.query(query, [idAluno]);
+            const respostaBD = await database.query(query, [idAluno]);
 
-        if (respostaBD.rowCount && respostaBD.rowCount > 0) {
-            return respostaBD.rows[0];
+            if (respostaBD.rowCount && respostaBD.rowCount > 0) {
+                return respostaBD.rows[0];
+            }
+
+            return null;
+        } catch (error) {
+            console.error(`Erro ao buscar plano do aluno. ${error}`);
+            return null;
         }
-
-        return null;
-    } catch (error) {
-        console.error(`Erro ao buscar plano do aluno. ${error}`);
-        return null;
     }
-}
 
-    // cadastrarAluno continua na tabela direta
     static async cadastrarAluno(aluno: any): Promise<boolean> {
         try {
             const query = `
-                INSERT INTO Aluno (nome, sobrenome, cpf, data_nascimento, endereco, email, celular, senha, status_aluno)
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+                INSERT INTO Aluno
+                (nome, sobrenome, cpf, data_nascimento, endereco, email, celular, senha, status_aluno)
+                VALUES
+                ($1, $2, $3, $4, $5, $6, $7, $8, $9)
                 RETURNING id_aluno;
             `;
+
             const respostaBD = await database.query(query, [
                 aluno.nome.toUpperCase(),
                 aluno.sobrenome.toUpperCase(),
@@ -168,10 +249,32 @@ class Aluno {
                 aluno.senha,
                 aluno.statusAluno
             ]);
-            return (respostaBD.rows.length ?? 0) > 0;
+
+            return respostaBD.rows.length > 0;
         } catch (error) {
             console.error(`Erro ao cadastrar aluno. ${error}`);
             return false;
+        }
+    }
+
+    static async listarAlunoComPlano(idAluno: number): Promise<any | null> {
+        try {
+            const query = `
+                SELECT *
+                FROM vw_aluno_com_plano
+                WHERE id_aluno = $1;
+            `;
+
+            const respostaBD = await database.query(query, [idAluno]);
+
+            if (respostaBD.rowCount && respostaBD.rowCount > 0) {
+                return respostaBD.rows[0];
+            }
+
+            return null;
+        } catch (error) {
+            console.error(`Erro ao buscar aluno com plano. ${error}`);
+            return null;
         }
     }
 }
