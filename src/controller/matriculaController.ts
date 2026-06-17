@@ -32,8 +32,9 @@ class MatriculaController extends Matricula {
       } else {
         return res
           .status(400)
-          .json({ mensagem: "Erro ao cadastrar Matrícula." });
+          .json({ mensagem: "Erro ao caadastrar Matrícula." });
       }
+      
 
     } catch (error) {
       console.error(`Erro no modelo. ${error}`);

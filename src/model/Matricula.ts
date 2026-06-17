@@ -1,5 +1,6 @@
 import { DatabaseModel } from "./DataBaseModel.js";
 import type { MatriculaDTO } from "../interface/MatriculaDTO.js";
+import Plano from "./Plano.js";
 
 const database = new DatabaseModel().pool;
 
@@ -51,6 +52,7 @@ class Matricula {
         this.valorPlano = _valorPlano;
         this.statusPlano = _statusPlano;
     }
+
     public getIdMatricula(): number {
         return this.idMatricula;
     }
@@ -83,6 +85,7 @@ class Matricula {
         this.dataMatricula = dataMatricula;
     }
 
+
     public getDataVencimento(): Date {
         return this.dataVencimento;
     }
@@ -98,6 +101,7 @@ class Matricula {
     public setValorPago(valorPago: number): void {
         this.valorPago = valorPago;
     }
+
     public getFormaPagamento(): string {
         return this.formaPagamento;
     }
@@ -114,84 +118,52 @@ class Matricula {
         this.statusMatricula = statusMatricula;
     }
 
-    public getNome(): string | undefined {
-        return this.nome;
-    }
-
-    public setNome(nome: string): void {
-        this.nome = nome;
-    }
-
-    public getSobrenome(): string | undefined {
-        return this.sobrenome;
-    }
-
-    public setSobrenome(sobrenome: string): void {
-        this.sobrenome = sobrenome;
-    }
-
-    public toJSON() {
-        return {
-            idMatricula: this.idMatricula,
-            codMatricula: this.codMatricula,
-            cod_matricula: this.codMatricula,
-            id_aluno: this.codAluno,
-            id_plano: this.codPlano,
-            cod_plano: this.codPlano,
-            tipo_plano: this.tipoPlano,
-            duracao_dias: this.duracaoDias,
-            valor_plano: this.valorPlano,
-            status_plano: this.statusPlano,
-            data_inicio: this.dataMatricula,
-            data_fim: this.dataVencimento,
-            valor_final: this.valorPago,
-            forma_pagamento: this.formaPagamento,
-            status_matricula: this.statusMatricula,
-            plano: {
-                cod_plano: this.codPlano,
-                tipo_plano: this.tipoPlano,
-                duracao_dias: this.duracaoDias,
-                valor: this.valorPlano,
-                status_plano: this.statusPlano
-            },
-            aluno: {
-                id_aluno: this.codAluno,
-                nome: this.nome,
-                sobrenome: this.sobrenome
-            },
-            nome: this.nome,
-            sobrenome: this.sobrenome
-        };
-    }
-
+    /**
+     * Cadastra uma nova matrícula chamando a Stored Procedure sp_cadastrar_matricula.
+     * A SP insere a matrícula e atualiza o status do aluno para ATIVO.
+     */
     static async cadastrarMatricula(matricula: MatriculaDTO): Promise<boolean> {
         try {
-            const query = `
-            INSERT INTO Matricula 
-            (cod_matricula, id_aluno, id_plano, data_inicio, data_fim, status_matricula, forma_pagamento, valor_final)
-            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-            RETURNING id_matricula;
-        `;
+            const plano = await Plano.listarPlano(matricula.id_plano);
+            const valorFinal = plano ? plano.getValor() : 0;
 
-            const valores = [
-                matricula.cod_matricula,
-                matricula.id_aluno,
-                matricula.id_plano,
-                matricula.data_inicio,
-                matricula.data_fim,
-                matricula.status_matricula,
-                matricula.forma_pagamento,
-                matricula.valor_final
-            ];
+            await database.query(
+                `CALL sp_cadastrar_matricula($1, $2, $3, $4, $5, $6)`,
+                [
+                    matricula.id_aluno,
+                    matricula.id_plano,
+                    matricula.data_inicio,
+                    matricula.data_fim,
+                    matricula.forma_pagamento,
+                    valorFinal
+                ]
+            );
 
-            const respostaBD = await database.query(query, valores);
-
-            return (respostaBD.rowCount ?? 0) > 0;
+            return true;
         } catch (error) {
             console.error(`Erro ao cadastrar matrícula: ${error}`);
             return false;
         }
     }
+
+    /**
+     * Cancela uma matrícula chamando a Stored Procedure sp_cancelar_matricula.
+     * A SP cancela a matrícula e atualiza o status do aluno para INATIVO se necessário.
+     */
+    static async cancelarMatricula(idMatricula: number): Promise<boolean> {
+        try {
+            await database.query(
+                `CALL sp_cancelar_matricula($1)`,
+                [idMatricula]
+            );
+
+            return true;
+        } catch (error) {
+            console.error(`Erro ao cancelar matrícula: ${error}`);
+            return false;
+        }
+    }
+
     static async listarMatricula(idMatricula: number): Promise<Matricula | null> {
         try {
             const query = `
@@ -204,9 +176,9 @@ class Matricula {
                 WHERE m.id_matricula = $1;
             `;
             const respostaBD = await database.query(query, [idMatricula]);
+
             if (respostaBD.rows.length > 0) {
                 const matriculaBD = respostaBD.rows[0];
-
                 const matricula = new Matricula(
                     matriculaBD.id_aluno,
                     matriculaBD.id_plano,
@@ -231,8 +203,8 @@ class Matricula {
             console.error(`Erro ao listar matrícula. ${error}`);
             return null;
         }
-
     }
+
     static async listarMatriculas(): Promise<Array<Matricula> | null> {
         try {
             const query = `
@@ -245,26 +217,20 @@ class Matricula {
             `;
             const respostaBD = await database.query(query);
             const matriculas: Array<Matricula> = [];
+
             respostaBD.rows.forEach((matriculaBD: any) => {
-                const matricula = new Matricula(
-                    matriculaBD.id_aluno,
-                    matriculaBD.id_plano,
-                    matriculaBD.data_inicio,
-                    matriculaBD.data_fim,
-                    matriculaBD.valor_final,
-                    matriculaBD.forma_pagamento,
-                    matriculaBD.status_matricula,
-                    matriculaBD.cod_matricula,
-                    matriculaBD.nome,
-                    matriculaBD.sobrenome,
-                    matriculaBD.tipo_plano,
-                    matriculaBD.duracao_dias,
-                    matriculaBD.valor_plano,
-                    matriculaBD.status_plano
-                );
-                matricula.setIdMatricula(matriculaBD.id_matricula);
-                matriculas.push(matricula);
+                matriculas.push({
+                    idMatricula: matriculaBD.id_matricula,
+                    codAluno: matriculaBD.id_aluno,
+                    codPlano: matriculaBD.id_plano,
+                    dataMatricula: matriculaBD.data_inicio,
+                    dataVencimento: matriculaBD.data_fim,
+                    valorPago: matriculaBD.valor_final,
+                    formaPagamento: matriculaBD.forma_pagamento,
+                    statusMatricula: matriculaBD.status_matricula,
+                } as any);
             });
+
             return matriculas;
         } catch (error) {
             console.error(`Erro ao listar matrículas. ${error}`);
@@ -272,4 +238,5 @@ class Matricula {
         }
     }
 }
+
 export default Matricula;

@@ -7,4 +7,14 @@ server.use(express.json());
 server.use(cors());
 server.use(router);
 
-export { server }
+server.use(cors()); 
+server.use(express.json()); 
+server.use(router); 
+
+const PORT = process.env.PORT || 3333;
+
+server.listen(PORT, () => {
+    console.log(` Servidor rodando em http://localhost:${PORT}`);
+});
+
+export { server };
