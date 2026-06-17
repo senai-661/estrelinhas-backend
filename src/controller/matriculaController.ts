@@ -67,4 +67,5 @@ class MatriculaController extends Matricula {
   }
 }
 
+
 export default MatriculaController;
