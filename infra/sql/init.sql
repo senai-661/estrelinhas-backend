@@ -285,7 +285,7 @@ INSERT INTO Plano
 VALUES
 ('Básico',30,89.90,'ATIVO'),
 ('Premium',30,149.90,'ATIVO'),
-('Black',30,249.90,'ATIVO'),
+('Black',30,249.90,'ATIVO');
 
 INSERT INTO Matricula
 (id_aluno, id_plano, data_inicio, data_fim, status_matricula, forma_pagamento, valor_final)
