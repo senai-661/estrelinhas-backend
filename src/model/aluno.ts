@@ -27,13 +27,21 @@ class Aluno {
     _email?: string
   ) {
     this.nome = _nome;
+
     this.sobrenome = _sobrenome;
+
     this.cpf = _cpf;
+
     this.dataNascimento = _dataNascimento;
+
     this.celular = _celular;
+
     this.senha = _senha;
+
     this.statusAluno = _statusAluno;
+
     this.endereco = _endereco || '';
+
     this.email = _email || '';
   }
 
@@ -111,10 +119,12 @@ class Aluno {
     try {
       const lista: Array<Aluno> = [];
 
-      const query = `SELECT id_aluno, nome, sobrenome, cpf, data_nascimento, endereco, email, celular, status_aluno FROM Aluno;`;
+      const query = `SELECT id_aluno, nome, sobrenome,
+       cpf, data_nascimento, endereco, email, celular, status_aluno FROM Aluno;`;
       const respostaBD = await database.query(query);
 
       respostaBD.rows.forEach((alunoBD: any) => {
+
         const novoAluno = new Aluno(
           alunoBD.nome,
           alunoBD.sobrenome,
@@ -136,9 +146,11 @@ class Aluno {
       console.error(`Erro ao listar alunos. ${error}`);
       return null;
     }
+
   }
 
   static async cadastrarAluno(aluno: any): Promise<boolean> {
+
     try {
       const query = `
         INSERT INTO Aluno (nome, sobrenome, cpf, data_nascimento, endereco, email, celular, senha, status_aluno)
@@ -147,6 +159,7 @@ class Aluno {
       `;
 
       const respostaBD = await database.query(query, [
+
         aluno.nome.toUpperCase(),
         aluno.sobrenome.toUpperCase(),
         aluno.cpf,
@@ -159,19 +172,23 @@ class Aluno {
       ]);
 
       if (respostaBD.rows.length > 0) {
-        console.info(`Aluno cadastrado com sucesso. ID: ${respostaBD.rows[0].id_aluno}`);
+
+        console.info
+        (`Aluno cadastrado com sucesso. ID: ${respostaBD.rows[0].id_aluno}`);
         return true;
       }
 
       return false;
     } catch (error) {
-      console.error(`Erro ao cadastrar aluno. ${error}`);
+      console.error
+      (`Erro ao cadastrar aluno. ${error}`);
       return false;
     }
   }
 
   static async listarAluno(idAluno: number): Promise<Aluno | null> {
     try {
+      
       const query = `SELECT * FROM Aluno WHERE id_aluno=$1;`;
       const respostaBD = await database.query(query, [idAluno]);
 
@@ -196,7 +213,8 @@ class Aluno {
 
       return null;
     } catch (error) {
-      console.error(`Erro ao buscar aluno no banco. ${error}`);
+      console.error
+      (`Erro ao buscar aluno no banco. ${error}`);
       return null;
     }
   }
