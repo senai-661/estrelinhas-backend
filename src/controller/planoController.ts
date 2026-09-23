@@ -1,7 +1,7 @@
 
 import type { Request, Response } from "express";
 import Plano from "../model/Plano.js";
-import type { PlanoDTO } from "../interface/PlanoDTO.js";
+import type { PlanoDTO } from "../interface/PlanoDTO";
 
 class PlanoController extends Plano {
     /**

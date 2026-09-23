@@ -1,5 +1,5 @@
 import { DatabaseModel } from "./DataBaseModel.js";
-import type { PlanoDTO } from "../interface/PlanoDTO.js";
+import type { PlanoDTO } from "../interface/PlanoDTO";
 
 const database = new DatabaseModel().pool;
 
