@@ -6,6 +6,7 @@ const database = new DatabaseModel().pool;
 class Plano {
 
   private codPlano: number = 0;
+
   private tipoPlano: string;
   private valor: number;
   private descricao?: string;
@@ -78,6 +79,8 @@ class Plano {
         const plano = new Plano(
           planoBD.tipo_plano,
           planoBD.duracao_dias,
+
+
           planoBD.valor,
           planoBD.status_plano,
           planoBD.descricao
@@ -129,6 +132,7 @@ class Plano {
 
       const query = `SELECT * FROM Plano WHERE id_plano=$1`;
 
+
       const respostaBD = await database.query(query, [codPlano]);
 
       if (respostaBD.rowCount) {
@@ -139,6 +143,7 @@ class Plano {
           planoBD.tipo_plano,
           planoBD.duracao_dias,
           planoBD.valor,
+
           planoBD.status_plano,
           planoBD.descricao
         );
@@ -152,7 +157,9 @@ class Plano {
 
     } catch (error) {
       console.error("Erro ao buscar plano", error);
+      
       return null;
+
     }
   }
 }

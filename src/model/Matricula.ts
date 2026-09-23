@@ -108,6 +108,7 @@ class Matricula {
                 matricula.id_plano,
                 matricula.data_inicio,
                 matricula.data_fim,
+                
                 matricula.status_matricula,
                 matricula.forma_pagamento,
                 matricula.valor_final
@@ -135,6 +136,7 @@ class Matricula {
                     matriculaBD.id_plano,
                     matriculaBD.data_inicio,
                     matriculaBD.data_fim,
+
                     matriculaBD.valor_final,
                     matriculaBD.forma_pagamento,
                     matriculaBD.status_matricula
@@ -150,6 +152,7 @@ class Matricula {
 
     }
     static async listarMatriculas(): Promise<Array<Matricula> | null> {
+
         try {
             const query = `SELECT * FROM Matricula;`;
             const respostaBD = await database.query(query);
