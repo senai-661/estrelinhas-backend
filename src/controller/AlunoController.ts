@@ -42,7 +42,7 @@ class AlunoController extends Aluno {
         .json({ mensagem: "Não foi possivel inserir o Aluno." });
     }
   }
-  static async aluno(req: Request, res: Response): Promise<Response> {
+static async aluno(req: Request, res: Response): Promise<Response> {
     try {
         const idAluno: number = parseInt(req.params.idAluno as string);
 
@@ -61,7 +61,7 @@ class AlunoController extends Aluno {
         console.error(`Erro ao acessar o Aluno. ${error}`);
         return res.status(500).json({ mensagem: "Não foi possível recuperar o Aluno." });
     }
-  }
+} 
 }
 
 export default AlunoController;

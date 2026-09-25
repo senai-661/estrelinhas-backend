@@ -13,10 +13,6 @@ router.get("/api", (req: Request, res: Response) => {
 });
 router.post("/api/login", Auth.validacaoUsuario);
 
-
-// rota de login (pública)
-router.post("/api/login", Auth.validacaoUsuario);
-
 // rotas protegidas
 router.get("/api/alunos", Auth.verifyToken, AlunoController.todos);
 router.post("/api/alunos", Auth.verifyToken, AlunoController.novo);
