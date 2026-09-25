@@ -167,9 +167,12 @@ class Matricula {
     static async listarMatricula(idMatricula: number): Promise<Matricula | null> {
         try {
             const query = `
-                SELECT m.*, a.nome AS nome, a.sobrenome AS sobrenome,
-                       p.cod_plano AS cod_plano_matricula, p.tipo_plano, p.duracao_dias,
-                       p.valor AS valor_plano, p.status_plano
+                  SELECT m.id_matricula, m.cod_matricula, m.id_aluno, m.id_plano,
+                      m.data_inicio, m.data_fim, m.valor_final,
+                      m.forma_pagamento, m.status_matricula,
+                      a.nome, a.sobrenome,
+                      p.cod_plano AS cod_plano_matricula, p.tipo_plano,
+                      p.duracao_dias, p.valor AS valor_plano, p.status_plano
                 FROM Matricula m
                 JOIN Aluno a ON m.id_aluno = a.id_aluno
                 JOIN Plano p ON m.id_plano = p.id_plano
@@ -208,9 +211,12 @@ class Matricula {
     static async listarMatriculas(): Promise<Array<Matricula> | null> {
         try {
             const query = `
-                SELECT m.*, a.nome AS nome, a.sobrenome AS sobrenome,
-                       p.cod_plano AS cod_plano_matricula, p.tipo_plano, p.duracao_dias,
-                       p.valor AS valor_plano, p.status_plano
+                  SELECT m.id_matricula, m.cod_matricula, m.id_aluno, m.id_plano,
+                      m.data_inicio, m.data_fim, m.valor_final,
+                      m.forma_pagamento, m.status_matricula,
+                      a.nome, a.sobrenome,
+                      p.cod_plano AS cod_plano_matricula, p.tipo_plano,
+                      p.duracao_dias, p.valor AS valor_plano, p.status_plano
                 FROM Matricula m
                 JOIN Aluno a ON m.id_aluno = a.id_aluno
                 JOIN Plano p ON m.id_plano = p.id_plano;
@@ -221,6 +227,7 @@ class Matricula {
             respostaBD.rows.forEach((matriculaBD: any) => {
                 matriculas.push({
                     idMatricula: matriculaBD.id_matricula,
+                    codMatricula: matriculaBD.cod_matricula,
                     codAluno: matriculaBD.id_aluno,
                     codPlano: matriculaBD.id_plano,
                     dataMatricula: matriculaBD.data_inicio,
@@ -228,6 +235,13 @@ class Matricula {
                     valorPago: matriculaBD.valor_final,
                     formaPagamento: matriculaBD.forma_pagamento,
                     statusMatricula: matriculaBD.status_matricula,
+                    nome: matriculaBD.nome,
+                    sobrenome: matriculaBD.sobrenome,
+                    codPlanoMatricula: matriculaBD.cod_plano_matricula,
+                    tipoPlano: matriculaBD.tipo_plano,
+                    duracaoDias: matriculaBD.duracao_dias,
+                    valorPlano: matriculaBD.valor_plano,
+                    statusPlano: matriculaBD.status_plano,
                 } as any);
             });
 

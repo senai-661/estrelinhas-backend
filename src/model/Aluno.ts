@@ -116,12 +116,26 @@ class Aluno {
         this.statusAluno = statusAluno;
     }
 
+    toJSON(): Record<string, unknown> {
+        return {
+            idAluno: this.idAluno,
+            nome: this.nome,
+            sobrenome: this.sobrenome,
+            dataNascimento: this.dataNascimento,
+            endereco: this.endereco,
+            email: this.email,
+            celular: this.celular,
+            statusAluno: this.statusAluno,
+        };
+    }
+
     static async listarAlunos(): Promise<Array<Aluno> | null> {
         try {
             const lista: Array<Aluno> = [];
 
             const query = `
-                SELECT *
+                  SELECT id_aluno, nome, sobrenome, data_nascimento,
+                      endereco, email, celular, status_aluno
                 FROM Aluno
                 ORDER BY status_aluno ASC, nome ASC;
             `;
@@ -132,10 +146,10 @@ class Aluno {
                 const novoAluno = new Aluno(
                     alunoBD.nome,
                     alunoBD.sobrenome,
-                    alunoBD.cpf,
+                    '',
                     alunoBD.data_nascimento,
                     alunoBD.celular,
-                    alunoBD.senha,
+                    '',
                     alunoBD.status_aluno,
                     alunoBD.endereco,
                     alunoBD.email
@@ -156,7 +170,8 @@ class Aluno {
     static async listarAluno(idAluno: number): Promise<Aluno | null> {
         try {
             const query = `
-                SELECT *
+                  SELECT id_aluno, nome, sobrenome, data_nascimento,
+                      endereco, email, celular, status_aluno
                 FROM Aluno
                 WHERE id_aluno = $1;
             `;
@@ -169,10 +184,10 @@ class Aluno {
                 const aluno = new Aluno(
                     alunoBD.nome,
                     alunoBD.sobrenome,
-                    alunoBD.cpf,
+                    '',
                     alunoBD.data_nascimento,
                     alunoBD.celular,
-                    alunoBD.senha,
+                    '',
                     alunoBD.status_aluno,
                     alunoBD.endereco,
                     alunoBD.email
