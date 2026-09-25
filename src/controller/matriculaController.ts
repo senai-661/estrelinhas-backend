@@ -57,6 +57,10 @@ class MatriculaController extends Matricula {
 
       const matricula = await Matricula.listarMatricula(idMatricula);
 
+      if (!matricula) {
+        return res.status(404).json({ mensagem: "Matrícula não encontrada." });
+      }
+
       return res.status(200).json(matricula);
 
     } catch (error) {
