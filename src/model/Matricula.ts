@@ -219,7 +219,8 @@ class Matricula {
                       p.duracao_dias, p.valor AS valor_plano, p.status_plano
                 FROM Matricula m
                 JOIN Aluno a ON m.id_aluno = a.id_aluno
-                JOIN Plano p ON m.id_plano = p.id_plano;
+                JOIN Plano p ON m.id_plano = p.id_plano
+                ORDER BY m.id_matricula ASC;
             `;
             const respostaBD = await database.query(query);
             const matriculas: Array<Matricula> = [];

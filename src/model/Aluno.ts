@@ -137,7 +137,7 @@ class Aluno {
                   SELECT id_aluno, nome, sobrenome, data_nascimento,
                       endereco, email, celular, status_aluno
                 FROM Aluno
-                ORDER BY status_aluno ASC, nome ASC;
+                ORDER BY id_aluno ASC;
             `;
 
             const respostaBD = await database.query(query);
