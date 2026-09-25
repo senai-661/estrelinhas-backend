@@ -202,18 +202,51 @@ class Aluno {
   }
   static async listarAlunoComPlano(idAluno: number): Promise<any | null> {
     try {
-        const query = `SELECT * FROM vw_aluno_com_plano WHERE id_aluno = $1;`;
-        const respostaBD = await database.query(query, [idAluno]);
+      const query = `
+        SELECT
+          a.id_aluno,
+          a.cod_aluno,
+          a.nome,
+          a.sobrenome,
+          a.cpf,
+          a.data_nascimento,
+          a.endereco,
+          a.email,
+          a.celular,
+          a.status_aluno,
+          p.cod_plano,
+          p.tipo_plano,
+          p.duracao_dias,
+          p.valor AS valor_plano,
+          p.descricao AS descricao_plano,
+          m.cod_matricula,
+          m.data_inicio,
+          m.data_fim,
+          m.status_matricula,
+          m.forma_pagamento,
+          m.valor_final
+        FROM Aluno a
+        LEFT JOIN Matricula m
+          ON m.id_aluno = a.id_aluno
+         AND UPPER(m.status_matricula) IN ('ATIVA', 'ATIVO')
+        LEFT JOIN Plano p
+          ON p.id_plano = m.id_plano
+        WHERE a.id_aluno = $1
+        LIMIT 1;
+      `;
 
-        if (respostaBD.rowCount && respostaBD.rowCount > 0) {
-            return respostaBD.rows[0];
-        }
-        return null;
+      const respostaBD = await database.query(query, [idAluno]);
+
+      if (respostaBD.rowCount && respostaBD.rowCount > 0) {
+        return respostaBD.rows[0];
+      }
+
+      return null;
     } catch (error) {
-        console.error(`Erro ao buscar aluno com plano. ${error}`);
-        return null;
+      console.error(`Erro ao buscar aluno com plano. ${error}`);
+      return null;
     }
-}
+  }
 }
 
 
