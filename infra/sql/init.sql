@@ -1,3 +1,5 @@
+<<<<<<< HEAD
+=======
 -- ============================================================
 -- INIT.SQL - GYMPRO
 -- ============================================================
@@ -5,16 +7,20 @@
 -- ============================================================
 -- SEQUENCES
 -- ============================================================
+>>>>>>> master
 
 CREATE SEQUENCE seq_cod_aluno START 1;
 CREATE SEQUENCE seq_cod_plano START 1;
 CREATE SEQUENCE seq_cod_matricula START 1;
 
 
+<<<<<<< HEAD
+=======
 -- ============================================================
 -- TABELAS
 -- ============================================================
 
+>>>>>>> master
 CREATE TABLE Aluno (
     id_aluno INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     cod_aluno VARCHAR(7) UNIQUE NOT NULL,
@@ -29,6 +35,18 @@ CREATE TABLE Aluno (
     status_aluno VARCHAR(20) DEFAULT 'ATIVO'
 );
 
+CREATE OR REPLACE FUNCTION gerar_cod_aluno() RETURNS TRIGGER AS $$
+BEGIN
+    NEW.cod_aluno := 'ALU' || TO_CHAR(nextval('seq_cod_aluno'), 'FM0000');
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_gerar_cod_aluno
+BEFORE INSERT ON Aluno
+FOR EACH ROW EXECUTE FUNCTION gerar_cod_aluno();
+
+
 CREATE TABLE Plano (
     id_plano INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     cod_plano VARCHAR(7) UNIQUE NOT NULL,
@@ -37,7 +55,19 @@ CREATE TABLE Plano (
     valor DECIMAL(10,2) NOT NULL,
     descricao VARCHAR(255),
     status_plano VARCHAR(20) DEFAULT 'ATIVO'
+      
 );
+
+CREATE OR REPLACE FUNCTION gerar_cod_plano() RETURNS TRIGGER AS $$
+BEGIN
+    NEW.cod_plano := 'PLN' || TO_CHAR(nextval('seq_cod_plano'), 'FM0000');
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_gerar_cod_plano
+BEFORE INSERT ON Plano
+FOR EACH ROW EXECUTE FUNCTION gerar_cod_plano();
 
 CREATE TABLE Matricula (
     id_matricula INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -51,6 +81,8 @@ CREATE TABLE Matricula (
     valor_final DECIMAL(10,2)
 );
 
+<<<<<<< HEAD
+=======
 
 -- ============================================================
 -- FUNCTIONS E TRIGGERS - CÓDIGOS AUTOMÁTICOS
@@ -82,6 +114,7 @@ FOR EACH ROW EXECUTE FUNCTION gerar_cod_plano();
 
 ---
 
+>>>>>>> master
 CREATE OR REPLACE FUNCTION gerar_cod_matricula() RETURNS TRIGGER AS $$
 BEGIN
     NEW.cod_matricula := 'MAT' || TO_CHAR(nextval('seq_cod_matricula'), 'FM0000');
@@ -94,10 +127,13 @@ BEFORE INSERT ON Matricula
 FOR EACH ROW EXECUTE FUNCTION gerar_cod_matricula();
 
 
+<<<<<<< HEAD
+=======
 -- ============================================================
 -- TRIGGER - BLOQUEAR MAIS DE UMA MATRÍCULA ATIVA
 -- ============================================================
 
+>>>>>>> master
 CREATE OR REPLACE FUNCTION bloquear_mais_de_uma_matricula_ativa()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -249,7 +285,7 @@ INSERT INTO Plano
 VALUES
 ('Básico',30,89.90,'ATIVO'),
 ('Premium',30,149.90,'ATIVO'),
-('Black',30,249.90,'ATIVO'),
+('Black',30,249.90,'ATIVO');
 
 INSERT INTO Matricula
 (id_aluno, id_plano, data_inicio, data_fim, status_matricula, forma_pagamento, valor_final)
@@ -264,3 +300,59 @@ VALUES
 (8,8,'2026-02-12','2026-02-13','FINALIZADA','DINHEIRO',149.90),
 (9,6,'2026-01-20','2026-02-20','CANCELADA','PIX',249.90),
 (10,10,'2026-01-05','2026-02-05','FINALIZADA','CARTAO',89.90);
+
+CREATE OR REPLACE PROCEDURE sp_cadastrar_matricula(
+    p_id_aluno INT,
+    p_id_plano INT,
+    p_data_inicio DATE,
+    p_forma_pagamento VARCHAR(30)
+)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_duracao INTEGER;
+    v_valor DECIMAL(10,2);
+BEGIN
+
+    IF NOT EXISTS (
+        SELECT 1
+        FROM Aluno
+        WHERE id_aluno = p_id_aluno
+    ) THEN
+        RAISE EXCEPTION 'Aluno não encontrado.';
+    END IF;
+
+    IF NOT EXISTS (
+        SELECT 1
+        FROM Plano
+        WHERE id_plano = p_id_plano
+    ) THEN
+        RAISE EXCEPTION 'Plano não encontrado.';
+    END IF;
+
+    SELECT duracao_dias, valor
+    INTO v_duracao, v_valor
+    FROM Plano
+    WHERE id_plano = p_id_plano;
+
+    INSERT INTO Matricula(
+        id_aluno,
+        id_plano,
+        data_inicio,
+        data_fim,
+        status_matricula,
+        forma_pagamento,
+        valor_final
+    )
+    VALUES(
+        p_id_aluno,
+        p_id_plano,
+        p_data_inicio,
+        p_data_inicio + v_duracao,
+        'ATIVA',
+        p_forma_pagamento,
+        v_valor
+    );
+
+END;
+$$;

@@ -8,7 +8,10 @@
   },
   "scripts": {
     "dev": "nodemon",
+<<<<<<< HEAD
     "start": "node --loader ts-node/esm src/server.ts",
+=======
+>>>>>>> marianna-monari
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
