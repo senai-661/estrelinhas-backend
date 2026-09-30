@@ -4,12 +4,13 @@ import type { PlanoDTO } from "../interface/PlanoDTO.js";
 const database = new DatabaseModel().pool;
 
 class Plano {
+    private codPlano: number = 0;
+    private tipoPlano: string;
+    private valor: number;
+    private descricao?: string;
+    private statusPlano: string;
 
-  private codPlano: number = 0;
-  private tipoPlano: string;
-  private valor: number;
-  private descricao?: string;
-  private statusPlano: string;
+
 
   constructor(
     _tipoPlano: string,
@@ -43,6 +44,8 @@ class Plano {
   public getValor(): number {
     return this.valor;
   }
+
+
 
   public setValor(valor: number): void {
     this.valor = valor;
@@ -151,7 +154,7 @@ class Plano {
       console.error("Erro ao buscar plano", error);
       return null;
     }
-  }
+}
 }
 
 export default Plano;

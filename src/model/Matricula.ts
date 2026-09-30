@@ -13,6 +13,13 @@ class Matricula {
     private valorPago: number;
     private formaPagamento: string;
     private statusMatricula: string;
+    private codMatricula: string | undefined;
+    private nome: string | undefined;
+    private sobrenome: string | undefined;
+    private tipoPlano: string | undefined;
+    private duracaoDias: number | undefined;
+    private valorPlano: number | undefined;
+    private statusPlano: string | undefined;
 
     constructor(
         _codAluno: number,
@@ -21,7 +28,14 @@ class Matricula {
         _dataVencimento: Date,
         _valorPago: number,
         _formaPagamento: string,
-        _statusMatricula: string
+        _statusMatricula: string,
+        _codMatricula?: string,
+        _nome?: string,
+        _sobrenome?: string,
+        _tipoPlano?: string,
+        _duracaoDias?: number,
+        _valorPlano?: number,
+        _statusPlano?: string
     ) {
         this.codAluno = _codAluno;
         this.codPlano = _codPlano;
@@ -30,6 +44,13 @@ class Matricula {
         this.valorPago = _valorPago;
         this.formaPagamento = _formaPagamento;
         this.statusMatricula = _statusMatricula;
+        this.codMatricula = _codMatricula;
+        this.nome = _nome;
+        this.sobrenome = _sobrenome;
+        this.tipoPlano = _tipoPlano;
+        this.duracaoDias = _duracaoDias;
+        this.valorPlano = _valorPlano;
+        this.statusPlano = _statusPlano;
     }
 
     public getIdMatricula(): number {
@@ -145,7 +166,18 @@ class Matricula {
 
     static async listarMatricula(idMatricula: number): Promise<Matricula | null> {
         try {
-            const query = `SELECT * FROM Matricula WHERE id_matricula=$1;`;
+            const query = `
+                  SELECT m.id_matricula, m.cod_matricula, m.id_aluno, m.id_plano,
+                      m.data_inicio, m.data_fim, m.valor_final,
+                      m.forma_pagamento, m.status_matricula,
+                      a.nome, a.sobrenome,
+                      p.cod_plano AS cod_plano_matricula, p.tipo_plano,
+                      p.duracao_dias, p.valor AS valor_plano, p.status_plano
+                FROM Matricula m
+                JOIN Aluno a ON m.id_aluno = a.id_aluno
+                JOIN Plano p ON m.id_plano = p.id_plano
+                WHERE m.id_matricula = $1;
+            `;
             const respostaBD = await database.query(query, [idMatricula]);
 
             if (respostaBD.rows.length > 0) {
@@ -157,7 +189,14 @@ class Matricula {
                     matriculaBD.data_fim,
                     matriculaBD.valor_final,
                     matriculaBD.forma_pagamento,
-                    matriculaBD.status_matricula
+                    matriculaBD.status_matricula,
+                    matriculaBD.cod_matricula,
+                    matriculaBD.nome,
+                    matriculaBD.sobrenome,
+                    matriculaBD.tipo_plano,
+                    matriculaBD.duracao_dias,
+                    matriculaBD.valor_plano,
+                    matriculaBD.status_plano
                 );
                 matricula.setIdMatricula(matriculaBD.id_matricula);
                 return matricula;
@@ -171,13 +210,25 @@ class Matricula {
 
     static async listarMatriculas(): Promise<Array<Matricula> | null> {
         try {
-            const query = `SELECT * FROM Matricula;`;
+            const query = `
+                  SELECT m.id_matricula, m.cod_matricula, m.id_aluno, m.id_plano,
+                      m.data_inicio, m.data_fim, m.valor_final,
+                      m.forma_pagamento, m.status_matricula,
+                      a.nome, a.sobrenome,
+                      p.cod_plano AS cod_plano_matricula, p.tipo_plano,
+                      p.duracao_dias, p.valor AS valor_plano, p.status_plano
+                FROM Matricula m
+                JOIN Aluno a ON m.id_aluno = a.id_aluno
+                JOIN Plano p ON m.id_plano = p.id_plano
+                ORDER BY m.id_matricula ASC;
+            `;
             const respostaBD = await database.query(query);
             const matriculas: Array<Matricula> = [];
 
             respostaBD.rows.forEach((matriculaBD: any) => {
                 matriculas.push({
                     idMatricula: matriculaBD.id_matricula,
+                    codMatricula: matriculaBD.cod_matricula,
                     codAluno: matriculaBD.id_aluno,
                     codPlano: matriculaBD.id_plano,
                     dataMatricula: matriculaBD.data_inicio,
@@ -185,6 +236,13 @@ class Matricula {
                     valorPago: matriculaBD.valor_final,
                     formaPagamento: matriculaBD.forma_pagamento,
                     statusMatricula: matriculaBD.status_matricula,
+                    nome: matriculaBD.nome,
+                    sobrenome: matriculaBD.sobrenome,
+                    codPlanoMatricula: matriculaBD.cod_plano_matricula,
+                    tipoPlano: matriculaBD.tipo_plano,
+                    duracaoDias: matriculaBD.duracao_dias,
+                    valorPlano: matriculaBD.valor_plano,
+                    statusPlano: matriculaBD.status_plano,
                 } as any);
             });
 
