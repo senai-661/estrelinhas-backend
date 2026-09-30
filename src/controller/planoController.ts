@@ -15,17 +15,15 @@ class PlanoController extends Plano {
 
     static async todos(req: Request, res: Response): Promise<Response> {
         try {
-            const listaPlanos: Array<Plano> | null = await Plano.listarPlanos();
+            const listaPlanos: Array<PlanoDTO> | null = await Plano.listarPlanos();
 
             return res.status(200).json(listaPlanos);
 
         } catch (error) {
             console.error(`Erro ao consultar modelo. ${error}`);
-
             return res.status(500).json({ mensagem: "Não foi possível acessar a lista de planos." });
         }
     }
-
     static async novo(req: Request, res: Response): Promise<Response> {
         try {
 

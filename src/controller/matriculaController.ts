@@ -32,8 +32,9 @@ class MatriculaController extends Matricula {
       } else {
         return res
           .status(400)
-          .json({ mensagem: "Erro ao cadastrar Matrícula." });
+          .json({ mensagem: "Erro ao caadastrar Matrícula." });
       }
+      
 
     } catch (error) {
       console.error(`Erro no modelo. ${error}`);
@@ -55,6 +56,10 @@ class MatriculaController extends Matricula {
       }
 
       const matricula = await Matricula.listarMatricula(idMatricula);
+
+      if (!matricula) {
+        return res.status(404).json({ mensagem: "Matrícula não encontrada." });
+      }
 
       return res.status(200).json(matricula);
 
