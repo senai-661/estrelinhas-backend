@@ -1,26 +1,9 @@
-<<<<<<< HEAD
-=======
--- ============================================================
--- INIT.SQL - GYMPRO
--- ============================================================
-
--- ============================================================
--- SEQUENCES
--- ============================================================
->>>>>>> master
 
 CREATE SEQUENCE seq_cod_aluno START 1;
 CREATE SEQUENCE seq_cod_plano START 1;
 CREATE SEQUENCE seq_cod_matricula START 1;
 
 
-<<<<<<< HEAD
-=======
--- ============================================================
--- TABELAS
--- ============================================================
-
->>>>>>> master
 CREATE TABLE Aluno (
     id_aluno INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     cod_aluno VARCHAR(7) UNIQUE NOT NULL,
@@ -81,40 +64,6 @@ CREATE TABLE Matricula (
     valor_final DECIMAL(10,2)
 );
 
-<<<<<<< HEAD
-=======
-
--- ============================================================
--- FUNCTIONS E TRIGGERS - CÓDIGOS AUTOMÁTICOS
--- ============================================================
-
-CREATE OR REPLACE FUNCTION gerar_cod_aluno() RETURNS TRIGGER AS $$
-BEGIN
-    NEW.cod_aluno := 'ALU' || TO_CHAR(nextval('seq_cod_aluno'), 'FM0000');
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trg_gerar_cod_aluno
-BEFORE INSERT ON Aluno
-FOR EACH ROW EXECUTE FUNCTION gerar_cod_aluno();
-
----
-
-CREATE OR REPLACE FUNCTION gerar_cod_plano() RETURNS TRIGGER AS $$
-BEGIN
-    NEW.cod_plano := 'PLN' || TO_CHAR(nextval('seq_cod_plano'), 'FM0000');
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trg_gerar_cod_plano
-BEFORE INSERT ON Plano
-FOR EACH ROW EXECUTE FUNCTION gerar_cod_plano();
-
----
-
->>>>>>> master
 CREATE OR REPLACE FUNCTION gerar_cod_matricula() RETURNS TRIGGER AS $$
 BEGIN
     NEW.cod_matricula := 'MAT' || TO_CHAR(nextval('seq_cod_matricula'), 'FM0000');
@@ -127,13 +76,6 @@ BEFORE INSERT ON Matricula
 FOR EACH ROW EXECUTE FUNCTION gerar_cod_matricula();
 
 
-<<<<<<< HEAD
-=======
--- ============================================================
--- TRIGGER - BLOQUEAR MAIS DE UMA MATRÍCULA ATIVA
--- ============================================================
-
->>>>>>> master
 CREATE OR REPLACE FUNCTION bloquear_mais_de_uma_matricula_ativa()
 RETURNS TRIGGER AS $$
 BEGIN
