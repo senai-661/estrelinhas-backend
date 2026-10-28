@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { type Request, type Response, type NextFunction } from 'express';
-import DatabaseModel from '../model/DataBaseModel.js';
+import { DatabaseModel } from '../model/DataBaseModel.js';
 
 const SECRET = process.env.JWT_SECRET ?? 'academia_secret';
 const database = new DatabaseModel().pool;
