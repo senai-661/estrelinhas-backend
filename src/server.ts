@@ -3,10 +3,15 @@ import cors from "cors";
 import { router } from "./routes.js";
 
 const server = express();
-server.use(express.json());
+
 server.use(cors());
+server.use(express.json());
 server.use(router);
 
+const PORT = Number(process.env.PORT) || 3333;
+
+server.listen(PORT, () => {
+  console.log(`Servidor rodando em http://localhost:${PORT}`);
 const PORT = process.env.PORT || 3333;
 
 server.listen(PORT, () => {

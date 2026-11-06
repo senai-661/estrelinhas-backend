@@ -11,19 +11,24 @@ const router: Router = Router();
 router.get("/api", (req: Request, res: Response) => {
     res.status(200).json({ mensagem: "Olá, seja bem-vindo ao GymPro!" });
 });
+
+// rota de login (pública)
 router.post("/api/login", Auth.validacaoUsuario);
 
 // rotas protegidas
 router.get("/api/alunos", Auth.verifyToken, AlunoController.todos);
 router.post("/api/alunos", Auth.verifyToken, AlunoController.novo);
+router.put("/api/alunos/:idAluno", Auth.verifyToken, AlunoController.atualizar);
 router.get("/api/alunos/:idAluno", Auth.verifyToken, AlunoController.aluno);
 
 router.get("/api/planos", Auth.verifyToken, PlanoController.todos);
 router.post("/api/planos", Auth.verifyToken, PlanoController.novo);
+router.put("/api/planos/:idPlano", Auth.verifyToken, PlanoController.atualizar);
 router.get("/api/planos/:idPlano", Auth.verifyToken, PlanoController.plano);
 
 router.get("/api/matriculas", Auth.verifyToken, MatriculaController.todos);
 router.post("/api/matriculas", Auth.verifyToken, MatriculaController.novo);
+router.put("/api/matriculas/:idMatricula", Auth.verifyToken, MatriculaController.atualizar);
 router.get("/api/matriculas/:idMatricula", Auth.verifyToken, MatriculaController.matricula);
 
 export { router };

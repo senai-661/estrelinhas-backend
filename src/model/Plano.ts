@@ -70,69 +70,59 @@ class Plano {
 
   static async listarPlanos(): Promise<Array<PlanoDTO> | null> {
     try {
-      const query = `SELECT * FROM Plano;`;
+      const query = `SELECT * FROM Plano ORDER BY id_plano;`;
       const respostaBD = await database.query(query);
 
-
-      if (respostaBD.rows.length > 0) {
-
-        
-      }
-
       return respostaBD.rows.map((planoBD: any) => ({
-        cod_plano: planoBD.id_plano,  
+        id_plano: planoBD.id_plano,
+        cod_plano: planoBD.cod_plano,
         tipo_plano: planoBD.tipo_plano,
-        duracao_dias: planoBD.duracao_dias,
-        valor: planoBD.valor,
+        duracao_dias: Number(planoBD.duracao_dias),
+        valor: Number(planoBD.valor),
         descricao: planoBD.descricao,
         status_plano: planoBD.status_plano,
       }));
-
     } catch (error) {
       console.error("Erro ao listar planos", error);
       return null;
     }
-
-
   }
+
   static async cadastrarPlano(plano: PlanoDTO): Promise<boolean> {
     try {
       const query = `
-            INSERT INTO plano
+            INSERT INTO Plano
             (tipo_plano, duracao_dias, valor, descricao, status_plano)
             VALUES ($1, $2, $3, $4, $5)
-            RETURNING cod_plano;
+            RETURNING id_plano, cod_plano;
         `;
 
       const respostaBD = await database.query(query, [
-        plano.tipo_plano,  
-        plano.duracao_dias, 
-        plano.valor,        
-        plano.descricao,   
-        plano.status_plano  
+        plano.tipo_plano,
+        plano.duracao_dias,
+        plano.valor,
+        plano.descricao,
+        plano.status_plano ?? "ATIVO",
       ]);
 
       if (respostaBD.rows.length > 0) {
-       console.info(`Plano cadastrado com sucesso. ID: ${respostaBD.rows[0].id_plano}`); 
+        console.info(`Plano cadastrado com sucesso. ID: ${respostaBD.rows[0].id_plano}`);
         return true;
       }
 
       return false;
-      
     } catch (error) {
       console.error(`Erro ao cadastrar plano. ${error}`);
       return false;
     }
   }
+
   static async listarPlano(codPlano: number): Promise<Plano | null> {
     try {
-
-    const query = `SELECT * FROM Plano WHERE id_plano=$1`;
-
+      const query = `SELECT * FROM Plano WHERE id_plano=$1;`;
       const respostaBD = await database.query(query, [codPlano]);
 
-      if (respostaBD.rowCount) {
-
+      if (respostaBD.rowCount && respostaBD.rowCount > 0) {
         const planoBD = respostaBD.rows[0];
 
         const plano = new Plano(
@@ -143,17 +133,44 @@ class Plano {
           planoBD.descricao
         );
 
-        plano.setCodPlano(planoBD.cod_plano);
-
+        plano.setCodPlano(planoBD.id_plano);
         return plano;
       }
 
       return null;
-
     } catch (error) {
       console.error("Erro ao buscar plano", error);
       return null;
     }
+  }
+
+  static async atualizarPlano(idPlano: number, plano: PlanoDTO): Promise<boolean | null> {
+    try {
+      const query = `
+        UPDATE Plano
+        SET tipo_plano = $1,
+            duracao_dias = $2,
+            valor = $3,
+            descricao = $4,
+            status_plano = $5
+        WHERE id_plano = $6
+        RETURNING id_plano;
+      `;
+      const respostaBD = await database.query(query, [
+        plano.tipo_plano,
+        plano.duracao_dias,
+        plano.valor,
+        plano.descricao,
+        plano.status_plano,
+        idPlano,
+      ]);
+
+      return respostaBD.rows.length > 0;
+    } catch (error) {
+      console.error("Erro ao atualizar plano", error);
+      return null;
+    }
+  }
 }
 }
 

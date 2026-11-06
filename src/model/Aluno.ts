@@ -269,6 +269,40 @@ class Aluno {
       return null;
     }
   }
+
+  static async atualizarAluno(idAluno: number, aluno: any): Promise<boolean | null> {
+    try {
+      const query = `
+        UPDATE Aluno
+        SET nome = $1,
+            sobrenome = $2,
+            cpf = $3,
+            data_nascimento = $4,
+            celular = $5,
+            status_aluno = $6,
+            endereco = $7,
+            email = $8
+        WHERE id_aluno = $9
+        RETURNING id_aluno;
+      `;
+      const respostaBD = await database.query(query, [
+        aluno.nome.toUpperCase(),
+        aluno.sobrenome.toUpperCase(),
+        aluno.cpf,
+        aluno.dataNascimento,
+        aluno.celular,
+        aluno.statusAluno,
+        aluno.endereco,
+        aluno.email?.toLowerCase(),
+        idAluno,
+      ]);
+
+      return respostaBD.rows.length > 0;
+    } catch (error) {
+      console.error(`Erro ao atualizar aluno. ${error}`);
+      return null;
+    }
+  }
 }
 
 
