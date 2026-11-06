@@ -7,9 +7,8 @@
     "doc": "docs"
   },
   "scripts": {
-    "build": "tsc",
-    "start": "node dist/server.js",
-    "dev": "npm run build && npm start",
+    "dev": "nodemon",
+    "start": "node --loader ts-node/esm src/server.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -23,17 +22,17 @@
     "dotenv": "^17.3.1",
     "express": "^5.3.0",
     "jsonwebtoken": "^9.0.3",
-    "pg": "^8.19.0",
-    "ts-node": "^10.9.2"
+    "pg": "^8.19.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/dotenv": "^6.1.1",
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
-    "@types/node": "^25.2.3",
+    "@types/node": "^25.9.7",
     "@types/pg": "^8.16.0",
     "nodemon": "^3.1.14",
+    "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.9.3"
   },

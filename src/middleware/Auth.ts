@@ -18,7 +18,15 @@ export class Auth {
     static async validacaoUsuario(req: Request, res: Response): Promise<any> {
         const { email, senha } = req.body;
 
-        const querySelectUser = `SELECT id, nome, email, senha, role FROM Usuario WHERE email=$1 AND senha=$2;`;
+        if (!email || !senha) {
+            return res.status(400).json({ auth: false, token: null, message: "E-mail e senha são obrigatórios" });
+        }
+
+        const querySelectUser = `
+            SELECT id, nome, email, senha, role
+            FROM usuario
+            WHERE LOWER(email) = LOWER($1) AND senha = $2;
+        `;
         try {
             const queryResult = await database.query(querySelectUser, [email, senha]);
 
