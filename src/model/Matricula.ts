@@ -171,26 +171,63 @@ class Matricula {
 
     static async listarMatriculas(): Promise<Array<Matricula> | null> {
         try {
-            const query = `SELECT * FROM Matricula;`;
+            const query = `SELECT * FROM Matricula ORDER BY id_matricula;`;
             const respostaBD = await database.query(query);
             const matriculas: Array<Matricula> = [];
 
             respostaBD.rows.forEach((matriculaBD: any) => {
-                matriculas.push({
-                    idMatricula: matriculaBD.id_matricula,
-                    codAluno: matriculaBD.id_aluno,
-                    codPlano: matriculaBD.id_plano,
-                    dataMatricula: matriculaBD.data_inicio,
-                    dataVencimento: matriculaBD.data_fim,
-                    valorPago: matriculaBD.valor_final,
-                    formaPagamento: matriculaBD.forma_pagamento,
-                    statusMatricula: matriculaBD.status_matricula,
-                } as any);
+                const matricula = new Matricula(
+                    matriculaBD.id_aluno,
+                    matriculaBD.id_plano,
+                    matriculaBD.data_inicio,
+                    matriculaBD.data_fim,
+                    Number(matriculaBD.valor_final),
+                    matriculaBD.forma_pagamento,
+                    matriculaBD.status_matricula
+                );
+
+                matricula.setIdMatricula(matriculaBD.id_matricula);
+                matriculas.push(matricula as any);
             });
 
             return matriculas;
         } catch (error) {
             console.error(`Erro ao listar matrículas. ${error}`);
+            return null;
+        }
+    }
+
+    static async atualizarMatricula(
+        idMatricula: number,
+        matricula: MatriculaDTO
+    ): Promise<boolean | null> {
+        try {
+            const query = `
+                UPDATE Matricula
+                SET id_aluno = $1,
+                    id_plano = $2,
+                    data_inicio = $3,
+                    data_fim = $4,
+                    status_matricula = $5,
+                    forma_pagamento = $6,
+                    valor_final = $7
+                WHERE id_matricula = $8
+                RETURNING id_matricula;
+            `;
+            const respostaBD = await database.query(query, [
+                matricula.id_aluno,
+                matricula.id_plano,
+                matricula.data_inicio,
+                matricula.data_fim,
+                matricula.status_matricula,
+                matricula.forma_pagamento,
+                matricula.valor_final,
+                idMatricula,
+            ]);
+
+            return respostaBD.rows.length > 0;
+        } catch (error) {
+            console.error(`Erro ao atualizar matrícula. ${error}`);
             return null;
         }
     }

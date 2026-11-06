@@ -42,6 +42,27 @@ class AlunoController extends Aluno {
         .json({ mensagem: "Não foi possivel inserir o Aluno." });
     }
   }
+  static async atualizar(req: Request, res: Response): Promise<Response> {
+    try {
+      const idAluno = Number(req.params.idAluno);
+      if (!Number.isInteger(idAluno) || idAluno <= 0) {
+        return res.status(400).json({ mensagem: "ID do Aluno inválido." });
+      }
+
+      const atualizado = await Aluno.atualizarAluno(idAluno, req.body);
+      if (atualizado === null) {
+        return res.status(500).json({ mensagem: "Não foi possível atualizar o Aluno." });
+      }
+      if (!atualizado) {
+        return res.status(404).json({ mensagem: "Aluno não encontrado." });
+      }
+
+      return res.status(200).json({ mensagem: "Aluno atualizado com sucesso." });
+    } catch (error) {
+      console.error(`Erro ao atualizar Aluno. ${error}`);
+      return res.status(500).json({ mensagem: "Não foi possível atualizar o Aluno." });
+    }
+  }
   static async aluno(req: Request, res: Response): Promise<Response> {
     try {
         const idAluno: number = parseInt(req.params.idAluno as string);

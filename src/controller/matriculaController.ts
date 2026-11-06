@@ -1,5 +1,6 @@
 import Matricula from "../model/Matricula.js";
 import type { Request, Response } from "express";
+import type { MatriculaDTO } from "../interface/MatriculaDTO.js";
 
 class MatriculaController extends Matricula {
 
@@ -40,6 +41,31 @@ class MatriculaController extends Matricula {
       return res
         .status(500)
         .json({ mensagem: "Não foi possível inserir a Matrícula." });
+    }
+  }
+
+  static async atualizar(req: Request, res: Response): Promise<Response> {
+    try {
+      const idMatricula = Number(req.params.idMatricula);
+      if (!Number.isInteger(idMatricula) || idMatricula <= 0) {
+        return res.status(400).json({ mensagem: "ID da Matrícula inválido." });
+      }
+
+      const atualizada = await Matricula.atualizarMatricula(
+        idMatricula,
+        req.body as MatriculaDTO
+      );
+      if (atualizada === null) {
+        return res.status(500).json({ mensagem: "Não foi possível atualizar a Matrícula." });
+      }
+      if (!atualizada) {
+        return res.status(404).json({ mensagem: "Matrícula não encontrada." });
+      }
+
+      return res.status(200).json({ mensagem: "Matrícula atualizada com sucesso." });
+    } catch (error) {
+      console.error(`Erro ao atualizar Matrícula. ${error}`);
+      return res.status(500).json({ mensagem: "Não foi possível atualizar a Matrícula." });
     }
   }
 

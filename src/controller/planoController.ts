@@ -41,6 +41,27 @@ class PlanoController extends Plano {
         }
 
     }
+    static async atualizar(req: Request, res: Response): Promise<Response> {
+        try {
+            const idPlano = Number(req.params.idPlano);
+            if (!Number.isInteger(idPlano) || idPlano <= 0) {
+                return res.status(400).json({ mensagem: "ID do plano inválido." });
+            }
+
+            const atualizado = await Plano.atualizarPlano(idPlano, req.body);
+            if (atualizado === null) {
+                return res.status(500).json({ mensagem: "Não foi possível atualizar o plano." });
+            }
+            if (!atualizado) {
+                return res.status(404).json({ mensagem: "Plano não encontrado." });
+            }
+
+            return res.status(200).json({ mensagem: "Plano atualizado com sucesso." });
+        } catch (error) {
+            console.error("Erro ao atualizar plano", error);
+            return res.status(500).json({ mensagem: "Não foi possível atualizar o plano." });
+        }
+    }
     static async plano(req: Request, res: Response): Promise<Response> {
 
         try {
